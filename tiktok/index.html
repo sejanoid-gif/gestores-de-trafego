@@ -263,19 +263,19 @@ footer p{margin-bottom:8px}
 .ad{position:relative}
 .ad .ab{filter:blur(6px);-webkit-user-select:none;user-select:none;pointer-events:none}
 .ad:after{content:"Disponível no gestor completo";position:absolute;left:50%;top:calc(50% + 18px);transform:translate(-50%,-50%);white-space:nowrap;background-color:rgba(31,30,29,.92);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f1ece1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:13px center;background-size:16px;border:1px solid var(--line);color:var(--cream);font:600 13.5px var(--sans);padding:10px 15px 10px 37px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
-/* barra de XP no topo */
-.xp{display:flex;align-items:center;gap:10px;margin:0 16px 6px;padding:7px 12px;border-radius:12px;background:var(--panel);border:1px solid var(--line);position:relative}
-.xpn{font:800 11px var(--sans);letter-spacing:.12em;color:#f0b37e;transition:color .4s}
-.xpb{flex:1;height:8px;border-radius:99px;background:#3a3935;overflow:hidden}
-.xpb i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#f0b37e,#f1ece1);transition:width .6s cubic-bezier(.2,.8,.2,1)}
-.xp b{font:700 13px var(--sans);font-variant-numeric:tabular-nums;min-width:58px;text-align:right}
-.xp.pulse b{animation:xpPulse .5s ease}
-@keyframes xpPulse{40%{transform:scale(1.25);color:#f0b37e}}
-.xpg{position:absolute;right:14px;top:-6px;font:800 13px var(--sans);color:#f0b37e;opacity:0;pointer-events:none}
+/* barra de progresso no topo: anda rápido no começo e devagar no fim */
+.xp{display:flex;align-items:center;gap:12px;margin:0 16px 6px;padding:8px 12px;border-radius:12px;background:var(--panel);border:1px solid var(--line)}
+.xpw{flex:1;position:relative;min-width:0}
+.xpb{height:8px;border-radius:99px;background:#3a3935;overflow:hidden}
+.xpb i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#f0b37e,#f1ece1);transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.xp b{font:650 12.5px var(--sans);white-space:nowrap;color:var(--cream);transition:color .4s}
+.xp.pulse .xpb{animation:xpPulse .55s ease}
+@keyframes xpPulse{40%{box-shadow:0 0 0 3px rgba(240,179,126,.35)}}
+.xpg{position:absolute;left:0;top:-19px;margin-left:-14px;font:800 12.5px var(--sans);color:#f0b37e;opacity:0;pointer-events:none;transition:left .7s cubic-bezier(.2,.8,.2,1)}
 .xpg.on{animation:xpUp 1.1s ease forwards}
-@keyframes xpUp{0%{opacity:0;transform:translateY(10px)}20%{opacity:1}100%{opacity:0;transform:translateY(-16px)}}
+@keyframes xpUp{0%{opacity:0;transform:translateY(8px)}20%{opacity:1}100%{opacity:0;transform:translateY(-12px)}}
 .xp.max .xpb i{background:linear-gradient(90deg,#86c79c,#f1ece1)}
-.xp.max .xpn{color:var(--ok)}
+.xp.max b{color:var(--ok)}
 /* passo gamificado: segure para desbloquear */
 .unl{position:relative;overflow:hidden;background:radial-gradient(120% 80% at 50% 0%,#23303f 0%,#161514 62%);border:1px solid #34465c;border-radius:22px;padding:22px 16px 22px;margin:6px 0 16px;text-align:center;color:var(--tx);animation:pop .4s ease;transition:border-color .4s,box-shadow .4s;--p:0}
 .unl .bft{font:700 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#9cc3ff;transition:color .4s}
@@ -334,7 +334,7 @@ footer p{margin-bottom:8px}
       <a href="#" id="restart">Nova conversa</a>
     </nav>
   </header>
-  <div class="xp h-chat" id="xp" role="status" aria-label="Sua experiência na conversa"><span class="xpn">XP</span><div class="xpb"><i id="xpFill"></i></div><b id="xpVal">0 XP</b><span class="xpg" id="xpGain" aria-hidden="true"></span></div>
+  <div class="xp h-chat" id="xp" role="status" aria-label="Seu progresso até liberar o gestor completo"><div class="xpw"><div class="xpb"><i id="xpFill"></i></div><span class="xpg" id="xpGain" aria-hidden="true"></span></div><b id="xpVal">Liberar gestor completo</b></div>
 
   <div class="log" id="log" aria-live="polite">
     <div class="hero home" id="hero">
@@ -603,7 +603,7 @@ function choose(id, list, p, lbl){
         if (id !== run) return;
         const hero = $('#hero'); if (hero) hero.remove(); $('#app').classList.add('started');
         const u = el('div','u'); u.appendChild(el('div', null, esc(o.t))); log.appendChild(u); down();
-        ganharXP(o.t === 'Aprovo.' ? 25 : 10, (p == null ? 0 : p) + 3);
+        ganharXP();
         resolve(o);
       };
       opts.appendChild(b);
@@ -986,18 +986,19 @@ function start(){
 }
 const tpl = el('template'); tpl.innerHTML = $('#hero').innerHTML;
 initWheel($('#bfOffer'));
-/* XP: cada resposta da pessoa vale pontos, até o desbloqueio */
-let xp = 0;
-function ganharXP(n, p){
-  xp += n;
+/* barra de progresso: cada resposta avança; as primeiras avançam bastante, as últimas pouco */
+let xpN = 0;
+const xpCurva = n => 92 * (1 - Math.exp(-n / 3.2));
+function ganharXP(){
+  const antes = xpCurva(xpN); xpN++; const agora = xpCurva(xpN);
   const box = $('#xp'), g = $('#xpGain');
-  $('#xpVal').textContent = xp + ' XP';
-  $('#xpFill').style.width = Math.min(96, Math.max(5, p)) + '%';
-  g.textContent = '+' + n + ' XP'; g.classList.remove('on'); void g.offsetWidth; g.classList.add('on');
+  $('#xpFill').style.width = agora.toFixed(1) + '%';
+  g.style.left = agora.toFixed(1) + '%';
+  g.textContent = '+' + Math.max(1, Math.round(agora - antes)) + '%'; g.classList.remove('on'); void g.offsetWidth; g.classList.add('on');
   box.classList.remove('pulse'); void box.offsetWidth; box.classList.add('pulse');
 }
-function xpMax(){ $('#xpFill').style.width = '100%'; $('#xp').classList.add('max'); $('#xpVal').textContent = xp + ' XP'; }
-function xpZerar(){ xp = 0; $('#xpVal').textContent = '0 XP'; $('#xpFill').style.width = '0'; $('#xp').classList.remove('max'); }
+function xpMax(){ $('#xpFill').style.width = '100%'; $('#xp').classList.add('max'); }
+function xpZerar(){ xpN = 0; $('#xpFill').style.width = '0'; $('#xpGain').style.left = '0'; $('#xp').classList.remove('max'); $('#xpVal').textContent = 'Liberar gestor completo'; }
 /* o texto dos anúncios borrados é trocado por letras aleatórias: o conteúdo real fica só no gestor */
 function embaralhar(node){
   if (!node) return;
@@ -1009,7 +1010,7 @@ function embaralhar(node){
 function desbloquear(id){
   return new Promise(resolve => {
     const box = el('div','unl');
-    box.innerHTML = '<div class="bft">Último passo</div><h4>Desbloqueie o seu gestor</h4><div class="bfs">Você juntou ' + xp + ' XP. Segure o botão até o cadeado abrir.</div>' +
+    box.innerHTML = '<div class="bft">Último passo</div><h4>Desbloqueie o seu gestor</h4><div class="bfs">Segure o botão até o cadeado abrir.</div>' +
       '<button class="hold" type="button" aria-label="Segure para desbloquear o gestor"><svg class="hr" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="unlGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9cc3ff"/><stop offset="1" stop-color="#f1ece1"/></linearGradient></defs><circle cx="50" cy="50" r="46" class="trk"/><circle cx="50" cy="50" r="46" class="prg"/></svg>' +
       '<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path class="arc" d="M8 11V8a4 4 0 0 1 8 0v3"/><path d="M12 15v2"/></svg></button>' +
       '<span class="onda"></span><span class="onda o2"></span><div class="hint" aria-live="polite">Toque e segure</div>';
@@ -1038,7 +1039,7 @@ function desbloquear(id){
       box.querySelector('.bft').textContent = 'Pronto';
       box.querySelector('h4').textContent = 'Gestor desbloqueado';
       box.querySelector('.bfs').textContent = 'Veja o que vem nele e o seu preço.';
-      hint.textContent = 'Desbloqueado!';
+      hint.textContent = 'Desbloqueado!'; $('#xpVal').textContent = 'Gestor completo liberado';
       if (!reduce){
         const cores = ['#86c79c','#f1ece1','#9cc3ff','#f0b37e'];
         for (let i = 0; i < 26; i++){
