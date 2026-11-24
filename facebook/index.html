@@ -235,6 +235,7 @@ body:not(.liberado) .sales,body:not(.liberado) footer,body:not(.liberado) .stick
 .sec .buy.light{background:var(--cream);color:var(--ink)}
 .guar{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:16px;font-size:14px;color:#5a564e;text-align:left}
 .guar span{width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--ink);flex:none}
+.combo[hidden]{display:none!important}
 .combo{margin-top:16px;background:var(--bg2);border:1px dashed #57544e;border-radius:18px;padding:18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .combo p{font-size:15px;color:#d6d2c8;flex:1 1 240px}
 .combo s{color:var(--dim)}
@@ -394,14 +395,14 @@ footer p{margin-bottom:8px}
         <div class="pnote" style="margin:0"><s>R$ 194</s> · 50% OFF de lançamento</div>
         <div class="price"><small>R$</small>97</div>
         <div class="pnote">pagamento único · acesso vitalício · depois de 30/11: R$ 194</div>
-        <a class="buy" href="[LINK CHECKOUT FACEBOOK]">Quero o meu gestor</a>
+        <a class="buy" href="https://pay.hotmart.com/S108615563A">Quero o meu gestor</a>
       </div>
       <div class="pnv"><a class="buy" href="#bfOffer">Raspar e revelar o meu preço</a></div>
       <div class="guar"><span>7</span>Garantia de 7 dias pela Hotmart. Se não gostar, pede o reembolso.</div>
     </div>
     <div class="bf" id="bfOffer"></div>
     <div class="req"><b>Requisito:</b> o gestor roda no Claude Code, então você precisa de um plano pago do Claude (contratado à parte, no site do Claude). Este produto é a pasta do gestor, não a assinatura.</div>
-    <div class="combo pv">
+    <div class="combo pv" hidden>
       <p><b>Anuncia também no Google ou no TikTok?</b><br>Leve os 3 gestores por <b>R$ 147</b> <s>R$ 291</s>.</p>
       <a href="[LINK CHECKOUT COMBO]">Ver o combo</a>
     </div>
@@ -490,7 +491,7 @@ footer p{margin-bottom:8px}
 
   <section class="sec" style="text-align:center">
     <h2 class="pv">Seu gestor de tráfego, por R$ 97.</h2>
-    <a class="buy light pv" href="[LINK CHECKOUT FACEBOOK]" style="margin-top:8px">Quero o meu gestor</a>
+    <a class="buy light pv" href="https://pay.hotmart.com/S108615563A" style="margin-top:8px">Quero o meu gestor</a>
     <h2 class="pnv">Seu gestor de tráfego está te esperando.</h2>
     <a class="buy light pnv" href="#bfOffer" style="margin-top:8px">Raspar e revelar o meu preço</a>
   </section>
@@ -505,7 +506,7 @@ footer p{margin-bottom:8px}
 
 <script>
 (() => {
-const CHECKOUT = '[LINK CHECKOUT FACEBOOK]';
+const CHECKOUT = 'https://pay.hotmart.com/S108615563A';
 const $ = s => document.querySelector(s);
 const log = $('#log'), opts = $('#opts'), ph = $('#ph'), inp = $('#inp');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
