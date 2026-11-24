@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TikTok Ads com Claude</title>
+<meta name="description" content="Com este arquivo, você transforma o Claude em um gestor de tráfego profissional de TikTok Ads.">
+<meta name="theme-color" content="#1f1e1d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1f1e1d; --bg2:#262624; --panel:#2b2a27; --bubble:#3a3935; --line:#3d3b37;
+  --tx:#f0eee6; --mut:#a29e95; --dim:#75716a;
+  --code-bg:#253041; --code-tx:#9cc3ff;
+  --ok:#86c79c; --warn:#e3b65f; --bad:#e58a78; --dot:#e2a05b;
+  --cream:#f1ece1; --ink:#0d0d0d;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--tx);font:16px/1.55 var(--sans)}
+a{color:inherit}
+b,strong{font-weight:650}
+code{font:.86em var(--mono);background:var(--code-bg);color:var(--code-tx);padding:.1em .38em;border-radius:6px;word-break:break-word}
+small{font-size:12.5px;color:var(--mut)}
+
+/* ================= APP ================= */
+.app{height:100svh;min-height:560px;max-width:760px;margin:0 auto;display:flex;flex-direction:column;position:relative}
+.top{display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 16px 8px}
+.circ{width:44px;height:44px;border-radius:50%;background:var(--panel);display:grid;place-items:center;flex:none;border:0;color:var(--tx);cursor:pointer;text-decoration:none}
+.circ svg{width:20px;height:20px}
+.title{flex:1;min-width:0;background:var(--panel);border-radius:999px;padding:6px 16px;text-align:center;line-height:1.25}
+.title b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title span{font-size:12.5px;color:var(--mut);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ring{position:relative}
+.ring svg{position:absolute;inset:4px;width:36px;height:36px;transform:rotate(-90deg)}
+.ring i{font-style:normal;font-size:12px;font-weight:600}
+.menu{position:absolute;right:16px;left:auto;top:64px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;z-index:5;display:none;min-width:220px;box-shadow:0 10px 30px #0008}
+.menu.on{display:block}
+.menu a{display:block;padding:10px 12px;border-radius:9px;text-decoration:none;font-size:15px}
+.menu a:hover{background:var(--bubble)}
+.strip{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 16px 4px;padding:8px 12px 8px 14px;border-radius:12px;background:#2c2a24;border:1px solid #4a4434;font-size:13px;color:#e8dcc0;text-decoration:none}
+.strip b{color:var(--cream)}
+.strip span:last-child{background:var(--cream);color:var(--ink);font-weight:700;border-radius:8px;padding:5px 10px;white-space:nowrap;font-size:13px}
+
+.log{flex:1;overflow-y:auto;padding:8px 20px 24px;overscroll-behavior:contain}
+.log::-webkit-scrollbar{width:0}
+
+.hero{min-height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:20px 4px}
+.tile{width:62px;height:62px;border-radius:15px;background:var(--ink);border:1px solid #333;color:var(--cream);font:400 23px/0.92 'Libre Baskerville',serif;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:20px}
+.hero h1{font:400 clamp(26px,6.4vw,40px)/1.18 'Libre Baskerville',serif;letter-spacing:-.01em;margin-bottom:14px}
+.hero h1 em{font-style:italic;color:var(--cream)}
+.hero p{color:var(--mut);font-size:16px;max-width:34em}
+.hero p b{color:var(--tx)}
+
+ .app:not(.started) .h-chat,.app.started .h-home,.app:not(.started) .strip{display:none!important}
+.home{align-items:center;text-align:center;padding:20px 10px}
+.home .tile{width:46px;height:46px;font-size:17px;border-radius:12px;margin:0 0 20px}
+.home h1.greet{font:400 clamp(28px,7.4vw,38px)/1.15 'Libre Baskerville',serif;color:#e6e1d6;margin-bottom:16px}
+.home p.prom{font:400 clamp(17px,4.7vw,21px)/1.45 'Libre Baskerville',serif;color:#cfcac0;max-width:22em;margin:0 auto}
+.home p.prom em{color:var(--cream)}
+.home small{display:block;margin-top:16px;color:var(--dim);font-size:13.5px}
+.app:not(.started) .inp .send{background:#f0eee6;color:#141413}.app:not(.started) .inp .send svg{opacity:1}
+.think .lbl{background:linear-gradient(90deg,#8d897f 0%,#8d897f 35%,#f3efe6 50%,#8d897f 65%,#8d897f 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shim 1.8s linear infinite}
+@keyframes shim{from{background-position:120% 0}to{background-position:-120% 0}}
+.think .dots{animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.u{display:flex;justify-content:flex-end;margin:22px 0 18px}
+.u div{background:var(--bubble);border-radius:22px;padding:12px 18px;max-width:86%;font-size:16px;animation:pop .25s ease}
+.g{margin:6px 0 14px;font-size:16px}
+.g p{margin:0 0 12px}
+.g p:last-child{margin-bottom:0}
+
+.tools{color:var(--mut);font-size:15px;margin:10px 0 12px;cursor:pointer;user-select:none}
+.tools .row{display:flex;align-items:center;gap:10px}
+.tools .row svg{width:18px;height:18px;flex:none}
+.tools .chev{transition:transform .2s;opacity:.7}
+.tools.open .chev{transform:rotate(90deg)}
+.tools ol{list-style:none;display:none;margin:8px 0 0 8px;border-left:1px solid var(--line);padding-left:14px;font:12.5px/1.65 var(--mono);color:var(--mut)}
+.tools.open ol{display:block}
+.tools ol li{margin-bottom:4px;word-break:break-word}
+.tools ol li span{display:block;color:var(--dim);padding-left:12px}
+
+.think{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:15px;margin:10px 0 14px}
+.dots{width:18px;height:18px;position:relative;flex:none}
+.dots i{position:absolute;width:5px;height:5px;border-radius:50%;background:#e07a55;animation:blink 1.1s infinite}
+.dots i:nth-child(1){left:0;top:6px}.dots i:nth-child(2){left:7px;top:0;animation-delay:.18s}.dots i:nth-child(3){left:13px;top:8px;animation-delay:.36s}.dots i:nth-child(4){left:6px;top:13px;animation-delay:.54s}
+@keyframes blink{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.stage{display:flex;align-items:center;gap:10px;margin:26px 0 12px;font:600 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cream)}
+.stage:after{content:"";flex:1;height:1px;background:var(--line)}
+.saved{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--ok);margin:8px 0 12px}
+.tbl{overflow-x:auto;margin:4px 0 14px;border:1px solid var(--line);border-radius:12px;animation:pop .3s ease}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl th,.tbl td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{color:var(--mut);font-weight:600;font-size:12.5px;background:var(--bg2)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr.star td{background:#2a2b22}
+.tbl tr.no td{color:var(--dim)}
+.tag{font:600 11.5px/1 var(--sans);letter-spacing:.04em;padding:4px 7px;border-radius:6px;display:inline-block;white-space:nowrap}
+.t-ok{background:#2a4434;color:var(--ok)}.t-bad{background:#4a2c27;color:var(--bad)}.t-warn{background:#4a3c22;color:var(--warn)}.t-info{background:#253041;color:var(--code-tx)}
+.ad{border:1px solid var(--line);border-radius:14px;margin:4px 0 14px;overflow:hidden;animation:pop .3s ease}
+.ad .ah{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 12px;background:var(--bg2);border-bottom:1px solid var(--line);font-size:13px;color:var(--mut)}
+.ad .ah code{font-size:12px}
+.ad .ab{padding:10px 12px}
+.quote{border-left:3px solid var(--line);padding:3px 0 3px 12px;margin:4px 0 10px;font-size:15px}
+.quote small{display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.05em;font-size:11.5px}
+.rot div{padding:8px 0;border-top:1px dashed var(--line);font-size:14px}
+.rot div:first-child{border-top:0;padding-top:0}
+.rot b{display:inline-block;font:600 12px var(--mono);color:var(--cream);background:var(--bubble);padding:2px 7px;border-radius:5px;margin-bottom:4px}
+.rot p{margin:2px 0}.rot p i{font-style:normal;font:600 11px var(--mono);color:var(--mut);margin-right:6px}
+.file{border:1px solid var(--line);border-radius:12px;margin:4px 0 14px;overflow:hidden;animation:pop .3s ease}
+.file .fh{font:12.5px var(--mono);color:var(--mut);background:var(--bg2);padding:8px 12px;border-bottom:1px solid var(--line)}
+.file pre{font:12.5px/1.7 var(--mono);padding:10px 12px;white-space:pre-wrap;color:#d6d2c8}
+.file pre .add{color:var(--ok)}
+.fill{color:#f0c987;background:#3a2f1a;border-radius:4px;padding:0 3px}
+.alert{background:#2c2618;border:1px solid #5a4a26;border-radius:12px;padding:11px 13px;margin:4px 0 12px;font-size:14.5px;color:#ead9b4}
+.cmp{display:grid;gap:6px;margin:4px 0 14px;font-size:14.5px}
+.cmp div{border-radius:10px;padding:9px 12px}
+.cmp .x{background:#33211e;color:#f0c4ba}
+.msg{background:#e9e6dd;color:#1d1c1a;border-radius:14px;padding:12px 14px;margin:4px 0 14px;font-size:14.5px;animation:pop .3s ease}
+.msg small{display:block;color:#6b675f;margin-bottom:4px}
+.done{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 14px}
+.done div{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13.5px;color:#d6d2c8}
+.done div b{display:block;color:var(--ok);font-size:13px;margin-bottom:2px}
+
+.pitch{background:var(--cream);color:var(--ink);border-radius:20px;padding:20px 18px;margin:6px 0 16px;animation:pop .4s ease}
+.pitch .ph1{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.pitch .tile{width:48px;height:48px;font-size:18px;border-radius:12px;margin:0}
+.pitch h3{font:400 19px/1.25 'Libre Baskerville',serif}
+.pitch h3 small{display:block;font:13px var(--sans);color:#5a564e}
+.pitch ul{list-style:none;font-size:14.5px;margin-bottom:14px}
+.pitch li{padding:5px 0 5px 22px;position:relative;border-bottom:1px solid #ddd6c6}
+.pitch li:before{content:"✓";position:absolute;left:2px;font-weight:700}
+.pitch .pr{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.pitch .pr b{font:700 34px/1 var(--sans);letter-spacing:-.02em}
+.pitch .pr span{font-size:13px;color:#5a564e}
+.pitch a{display:block;text-align:center;background:var(--ink);color:var(--cream);text-decoration:none;font-weight:700;padding:15px;border-radius:12px}
+.pitch .fine{font-size:12px;color:#6b675f;text-align:center;margin-top:10px}
+
+/* roleta da Black Friday */
+.bf{background:radial-gradient(120% 80% at 50% 0%,#3a2a1c 0%,#161514 60%);border:1px solid #5a4630;border-radius:22px;padding:22px 16px 20px;margin:6px 0 16px;text-align:center;color:var(--tx);animation:pop .4s ease}
+.bf .bft{font:700 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#f0b37e}
+.bf h4{font:400 22px/1.25 'Libre Baskerville',serif;margin:6px 0 4px}
+.bf .bfs{font-size:14px;color:var(--mut);margin-bottom:16px}
+.scr{position:relative;max-width:320px;height:150px;margin:0 auto 16px;border-radius:16px;overflow:hidden;background:#f1ece1;color:#141413;display:grid;place-items:center;touch-action:none}
+.scr .big{display:block;font:800 40px/1 var(--sans);color:#c4572f}
+.scr .np{font-size:16px;margin-top:6px}.scr .np s{color:#8a857b}
+.scr canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer;transition:opacity .6s}
+.bf.won canvas{pointer-events:none}
+.bf .res{display:none}
+.bf.won .res{display:block;animation:pop .4s ease}
+.bf .res a{display:block;max-width:340px;margin:0 auto;background:var(--cream);color:var(--ink);text-decoration:none;font-weight:700;font-size:16px;padding:16px;border-radius:14px}
+.bf .fine{font-size:11.5px;color:var(--dim);margin-top:10px}
+body:not(.revealed) .pv{display:none!important}
+body.revealed .pnv{display:none!important}
+/* a parte de vendas só aparece depois que a pessoa faz a conversa */
+body:not(.liberado) .sales,body:not(.liberado) footer,body:not(.liberado) .stick,body:not(.liberado) .strip,body:not(.liberado) .top a[href^="#"]:not(#restart){display:none!important}
+.scr .prize{visibility:hidden}.scr.pronto .prize,.bf.won .scr .prize{visibility:visible}
+.foot{padding:8px 14px max(14px,env(safe-area-inset-bottom))}
+.sugs{display:flex;flex-direction:column;gap:7px;margin-bottom:10px;max-height:42svh;overflow-y:auto}
+.sugs:empty{display:none}
+.sugs::-webkit-scrollbar{width:0}
+.sugs .lbl{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;padding:0 4px}
+.sugs.pills{flex-direction:row;flex-wrap:wrap;justify-content:flex-end}
+.sugs.pills .lbl{width:100%;text-align:right}
+.opt{font:14.5px/1.38 var(--sans);color:var(--tx);background:var(--bg2);border:1px solid #4a4843;border-radius:18px;padding:10px 14px;cursor:pointer;text-align:left;animation:pop .25s ease both;display:flex;gap:10px;align-items:flex-start}
+.opt:before{content:"";flex:none;width:16px;height:16px;margin-top:2px;background:currentColor;opacity:.45;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5 12l7-7 7 7'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5 12l7-7 7 7'/%3E%3C/svg%3E") center/contain no-repeat}
+.sugs.pills .opt{border-radius:999px;padding:10px 16px}
+.sugs.pills .opt:before{display:none}
+.opt:hover,.opt:focus-visible{background:var(--bubble);outline:none}
+.opt.cta{background:var(--cream);color:var(--ink);border-color:var(--cream);font-weight:650}
+.opt.cta:before{display:none}
+.inp{display:flex;align-items:flex-end;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:6px 6px 6px 8px}
+.inp .plus,.inp .mic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--mut);flex:none}
+.inp .plus{background:var(--bubble);color:var(--tx)}
+.inp .ph{flex:1;align-self:center;color:var(--dim);font-size:15.5px;line-height:1.4;padding:4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inp .ph.typing{color:var(--tx);white-space:normal}
+.inp .send{width:38px;height:38px;border-radius:50%;background:var(--bubble);display:grid;place-items:center;flex:none;transition:background .15s}
+.inp .send svg{opacity:.35}
+.inp .send i{width:12px;height:12px;border-radius:3px;background:var(--tx);display:none}
+.inp.busy .send svg{display:none}.inp.busy .send i{display:block}
+.inp.ready .send{background:var(--cream);color:var(--ink)}.inp.ready .send svg{opacity:1}
+.sim{font-size:11.5px;color:var(--dim);text-align:center;margin-top:8px}
+
+/* ================= VENDAS ================= */
+.sales{max-width:760px;margin:0 auto;padding:30px 20px 30px}
+.sec{padding:44px 0;border-top:1px solid var(--line)}
+.sec:first-child{border-top:0}
+.kick{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.sec h2{font:400 clamp(25px,5.4vw,34px)/1.22 'Libre Baskerville',serif;margin-bottom:16px}
+.sec>p{color:#d6d2c8;margin-bottom:14px;max-width:36em}
+.recap{list-style:none;margin:18px 0 6px;display:grid;gap:8px}
+.recap li{display:flex;gap:12px;align-items:flex-start;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:15px;color:#d6d2c8}
+.recap li b{color:var(--tx)}
+.recap li i{font-style:normal;flex:none;width:26px;height:26px;border-radius:50%;background:#2a4434;color:var(--ok);display:grid;place-items:center;font-weight:700;font-size:13px}
+.who{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:16px}
+.who div{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:16px}
+.who b{display:block;margin-bottom:4px}
+.who span{font-size:14.5px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:20px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:18px}
+.card code{font-size:14px}
+.card p{color:var(--mut);font-size:15px;margin-top:8px}
+.steps{counter-reset:s;list-style:none;margin-top:18px}
+.steps li{counter-increment:s;position:relative;padding:0 0 22px 52px}
+.steps li:before{content:counter(s);position:absolute;left:0;top:0;width:36px;height:36px;border-radius:50%;background:var(--bubble);display:grid;place-items:center;font-weight:650}
+.steps li b{display:block;margin-bottom:2px}
+.steps li span{color:var(--mut);font-size:15px}
+.tree{font:13.5px/1.75 var(--mono);background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:18px;overflow-x:auto;margin-top:18px;white-space:pre;color:#d6d2c8}
+.tree .c{color:var(--dim)}.tree .h{color:var(--ok)}
+.learn{display:grid;gap:10px;margin-top:18px}
+.learn div{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:15px}
+.learn small{display:block;font:12.5px var(--mono);color:var(--ok);margin-bottom:4px}
+.ctrl{list-style:none;margin-top:14px}
+.ctrl li{padding:10px 0 10px 30px;position:relative;border-bottom:1px solid var(--line);color:#d6d2c8}
+.ctrl li:before{content:"✓";position:absolute;left:4px;color:var(--ok);font-weight:700}
+.req{background:#2c2618;border:1px solid #5a4a26;border-radius:16px;padding:16px 18px;margin-top:16px;color:#ead9b4;font-size:15px}
+.req b{color:var(--warn)}
+.offer{background:var(--cream);color:var(--ink);border-radius:24px;padding:28px 22px;text-align:center;margin-top:18px}
+.offer .tile{margin:0 auto 16px;width:72px;height:72px;font-size:27px;border-radius:18px}
+.offer h3{font:400 24px/1.25 'Libre Baskerville',serif;margin-bottom:6px}
+.offer .sub{color:#5a564e;font-size:15px;margin-bottom:18px}
+.offer ul{list-style:none;text-align:left;max-width:400px;margin:0 auto 20px;font-size:15px}
+.offer li{padding:7px 0 7px 26px;position:relative;border-bottom:1px solid #ddd6c6}
+.offer li:before{content:"✓";position:absolute;left:2px;font-weight:700}
+.offer code{background:#e0dacb;color:#1d1c1a}
+.price{font:700 50px/1 var(--sans);letter-spacing:-.02em;margin:8px 0 4px}
+.price small{font-size:18px;font-weight:600;vertical-align:top;margin-right:4px;color:inherit}
+.pnote{font-size:13.5px;color:#5a564e;margin-bottom:18px}
+.buy{display:block;width:100%;max-width:420px;margin:0 auto;background:var(--ink);color:var(--cream);text-decoration:none;font-weight:700;font-size:17px;padding:18px;border-radius:14px;text-align:center}
+.sec .buy.light{background:var(--cream);color:var(--ink)}
+.guar{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:16px;font-size:14px;color:#5a564e;text-align:left}
+.guar span{width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--ink);flex:none}
+.combo{margin-top:16px;background:var(--bg2);border:1px dashed #57544e;border-radius:18px;padding:18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.combo p{font-size:15px;color:#d6d2c8;flex:1 1 240px}
+.combo s{color:var(--dim)}
+.combo a{border:1px solid var(--cream);color:var(--cream);text-decoration:none;font-weight:650;padding:11px 16px;border-radius:12px;font-size:15px;white-space:nowrap}
+details{border-bottom:1px solid var(--line);padding:16px 0}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";color:var(--mut);font-size:20px;line-height:1}
+details[open] summary:after{content:"–"}
+details p{color:var(--mut);margin-top:10px;font-size:15.5px}
+footer{max-width:760px;margin:0 auto;padding:30px 20px 90px;color:var(--dim);font-size:12.5px;border-top:1px solid var(--line)}
+footer p{margin-bottom:8px}
+.stick{position:fixed;left:0;right:0;bottom:0;padding:10px 16px max(10px,env(safe-area-inset-bottom));background:#1f1e1dee;backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between;transform:translateY(110%);transition:transform .3s;z-index:20}
+.stick.on{transform:none}
+.stick div{font-size:14px;line-height:1.3}.stick div b{display:block;font-size:15px}
+.stick a{background:var(--cream);color:var(--ink);text-decoration:none;font-weight:700;padding:12px 18px;border-radius:12px;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media (max-height:900px) and (max-width:700px){.hero{padding-top:6px}.hero .tile{width:44px;height:44px;font-size:16px;border-radius:11px;margin-bottom:14px}.hero h1{font-size:24px;margin-bottom:10px}.hero p{font-size:14.5px}}
+@media (min-width:700px){.log{padding:8px 28px 24px}.foot{padding-left:22px;padding-right:22px}}
+.cc{font:600 11px var(--mono);color:var(--ok);margin-left:4px;white-space:nowrap}.cc.over{color:var(--bad)}
+/* fim da conversa: a página vira uma rolagem só, do chat até a parte de vendas */
+.app.fim{height:auto;min-height:0}
+.app.fim .log{overflow:visible;flex:none}
+.app.fim .foot{display:none}
+/* passo gamificado: segure para desbloquear */
+.unl{position:relative;overflow:hidden;background:radial-gradient(120% 80% at 50% 0%,#23303f 0%,#161514 62%);border:1px solid #34465c;border-radius:22px;padding:22px 16px 22px;margin:6px 0 16px;text-align:center;color:var(--tx);animation:pop .4s ease;transition:border-color .4s,box-shadow .4s;--p:0}
+.unl .bft{font:700 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#9cc3ff;transition:color .4s}
+.unl h4{font:400 22px/1.25 'Libre Baskerville',serif;margin:6px 0 4px}
+.unl .bfs{font-size:14px;color:var(--mut);margin-bottom:24px}
+.hold{position:relative;width:124px;height:124px;border-radius:50%;border:0;background:radial-gradient(circle at 50% 35%,#2b3a4b,#18212b);color:var(--cream);display:grid;place-items:center;margin:0 auto;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;transition:transform .18s ease,background .4s,color .4s;box-shadow:0 0 calc(12px + var(--p) * 44px) calc(var(--p) * 10px) rgba(156,195,255,calc(.12 + var(--p) * .5))}
+.hold:before{content:"";position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(156,195,255,.4);animation:respira 1.8s ease-in-out infinite;pointer-events:none}
+.unl.on .hold:before,.unl.open .hold:before{animation:none;opacity:0}
+@keyframes respira{0%,100%{transform:scale(.9);opacity:0}50%{transform:scale(1.05);opacity:1}}
+.unl.on .hold{transform:scale(.94)}
+.hold:focus-visible{outline:2px solid #9cc3ff;outline-offset:8px}
+.hold .hr{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.hold .trk{fill:none;stroke:#34465c;stroke-width:5}
+.hold .prg{fill:none;stroke:url(#unlGrad);stroke-width:5;stroke-linecap:round}
+.hold .lk{width:46px;height:46px;position:relative}
+.unl.on .lk{animation:treme .11s linear infinite}
+@keyframes treme{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(-1px,0) rotate(-4deg)}50%{transform:translate(0,1px)}75%{transform:translate(1px,0) rotate(4deg)}}
+.hold .arc{transition:transform .5s cubic-bezier(.3,1.7,.5,1);transform-origin:16px 11px}
+.unl.open .arc{transform:translateY(-4px) rotate(34deg)}
+.unl.open .hold{background:radial-gradient(circle at 50% 35%,#3b6a50,#1d3326);color:#d4f5df;animation:estoura .6s cubic-bezier(.3,1.7,.5,1);box-shadow:0 0 56px 12px rgba(134,199,156,.45)}
+@keyframes estoura{0%{transform:scale(.94)}45%{transform:scale(1.16)}100%{transform:scale(1)}}
+.unl.open .prg{stroke:var(--ok)}
+.unl .onda{position:absolute;left:50%;top:var(--cy,50%);width:124px;height:124px;margin:-62px 0 0 -62px;border-radius:50%;border:3px solid var(--ok);opacity:0;pointer-events:none}
+.unl.open .onda{animation:onda .9s ease-out forwards}
+.unl.open .onda.o2{animation-delay:.18s}
+@keyframes onda{0%{transform:scale(1);opacity:.9}100%{transform:scale(3.4);opacity:0}}
+.unl .fa{position:absolute;left:50%;top:var(--cy,50%);width:8px;height:8px;margin:-4px;border-radius:2px;pointer-events:none;animation:faisca 1s cubic-bezier(.15,.7,.3,1) forwards}
+@keyframes faisca{0%{transform:translate(0,0) rotate(0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--r)) scale(.3);opacity:0}}
+.unl.open{border-color:#4f8a63;box-shadow:0 10px 40px -10px rgba(134,199,156,.35)}
+.unl.open .bft{color:var(--ok)}
+.unl.open h4,.unl.open .bfs{animation:pop .4s ease}
+.unl .hint{margin-top:18px;font-size:14px;color:var(--mut);min-height:1.4em;font-variant-numeric:tabular-nums}
+.unl.open .hint{color:var(--ok);font-weight:650}
+.offer.no-chat{margin:6px 0 16px;animation:pop .45s ease}
+</style>
+</head>
+<body>
+
+<!-- ================= CONVERSA ================= -->
+<section class="app" id="app" aria-label="Simulação de conversa com o gestor">
+  <header class="top">
+    <button class="circ h-home" id="menuBtn2" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+    <span class="h-home" style="flex:1"></span>
+    <a class="circ h-home" href="#viu" aria-label="O que é"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></a>
+    <a class="circ h-chat" href="#viu" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></a>
+    <div class="title h-chat"><b>TikTok Ads com Claude</b><span id="stageTxt">Gestor de tráfego</span></div>
+    <div class="circ ring h-chat" title="Progresso da campanha">
+      <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#3d3b37" stroke-width="3"/><circle id="ringArc" cx="18" cy="18" r="15.5" fill="none" stroke="#6da0f0" stroke-width="3" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="97.4" style="transition:stroke-dashoffset .5s"/></svg>
+      <i id="ringTxt">0</i>
+    </div>
+    <button class="circ h-chat" id="menuBtn" aria-label="Mais opções"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
+    <nav class="menu" id="menu">
+      <a href="#oferta">Levar o gestor para a minha conta</a>
+      <a href="#faz">O que vem no arquivo</a>
+      <a href="#faq">Perguntas frequentes</a>
+      <a href="#" id="restart">Nova conversa</a>
+    </nav>
+  </header>
+
+  <div class="log" id="log" aria-live="polite">
+    <div class="hero home" id="hero">
+      <div class="tile" aria-hidden="true"><div>TA</div><div>CL</div></div>
+      <h1 class="greet">Olá</h1>
+      <p class="prom">Com este arquivo, você transforma o Claude em um <em>gestor de tráfego profissional</em> de TikTok Ads.</p>
+      <small>Peça uma campanha e veja ele montar tudo com os seus números.</small>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="sugs" id="opts"></div>
+    <div class="inp" id="inp">
+      <span class="plus"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+      <span class="ph" id="ph">Peça algo ao seu gestor…</span>
+      <span class="mic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg></span>
+      <span class="send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg><i></i></span>
+    </div>
+    <div class="sim">Simulação de como o gestor trabalha. Negócios e números fictícios.</div>
+  </div>
+</section>
+
+<!-- ================= VENDAS ================= -->
+<main class="sales">
+
+  <section class="sec" id="viu">
+    <div class="kick">O que você acabou de ver</div>
+    <h2>Isso é o que ele faz na sua conta. Toda vez que você pedir.</h2>
+    <ul class="recap">
+      <li><i>1</i><span><b>Entende o seu negócio</b> e calcula quanto você pode pagar por venda antes de gastar R$ 1.</span></li>
+      <li><i>2</i><span><b>Escolhe a estrutura que cabe na sua verba</b>, do teste manual ao Smart+, e avisa quando uma não cabe.</span></li>
+      <li><i>3</i><span><b>Monta a estratégia completa:</b> campanha, grupo de anúncios, público, orçamento, linha de corte e de escala.</span></li>
+      <li><i>4</i><span><b>Cria os ganchos dos 2 primeiros segundos</b> e escreve roteiros nativos, prontos para gravar com o celular.</span></li>
+      <li><i>5</i><span><b>Sobe no TikTok Ads Manager como rascunho</b> (ou te dá o passo a passo) e entrega o plano de 14 dias.</span></li>
+      <li><i>6</i><span><b>Analisa o resultado, pausa, escala e guarda o que aprendeu.</b> A próxima campanha começa dali.</span></li>
+    </ul>
+  </section>
+
+  <section class="sec" id="oferta">
+    <div class="kick">Leve o gestor para a sua conta</div>
+    <h2>O gestor da conversa acima, na sua conta. Para sempre.</h2>
+    <p>Na conversa você viu uma amostra. No seu TikTok Ads Manager de verdade ele é <b>muito mais detalhista</b>: lê cada campanha, grupo de anúncios, vídeo, retenção e comentário antes de decidir, e guarda tudo no histórico. Para começar, é só copiar e colar o arquivo no Claude.</p>
+    <div class="offer">
+      <div class="tile" aria-hidden="true"><div>TA</div><div>CL</div></div>
+      <h3>TikTok Ads com Claude</h3>
+      <div class="sub">Gestor de tráfego de TikTok Ads</div>
+      <ul>
+        <li><b>Acesso vitalício</b>: pagamento único, sem mensalidade do gestor</li>
+        <li><b>É só copiar e colar o arquivo no Claude</b> e ele começa a trabalhar</li>
+        <li>O gestor completo, com 10 comandos (<code>/campanha</code>, <code>/criativos</code>, <code>/analisar</code>…)</li>
+        <li>Base de conhecimento: playbooks, estruturas, Smart+, Spark Ads, métricas, copy e políticas do TikTok</li>
+        <li>Histórico que aprende com a sua conta</li>
+        <li>Script que lê o relatório exportado do TikTok Ads Manager</li>
+        <li>Uma pasta por cliente, para quem gerencia várias contas</li>
+        <li>Guia de instalação em PDF</li>
+      </ul>
+      <div class="pv">
+        <div class="pnote" style="margin:0"><s>R$ 194</s> · 50% OFF de lançamento</div>
+        <div class="price"><small>R$</small>97</div>
+        <div class="pnote">pagamento único · acesso vitalício · depois de 30/11: R$ 194</div>
+        <a class="buy" href="[LINK CHECKOUT TIKTOK]">Quero o meu gestor</a>
+      </div>
+      <div class="pnv"><a class="buy" href="#bfOffer">Raspar e revelar o meu preço</a></div>
+      <div class="guar"><span>7</span>Garantia de 7 dias pela Hotmart. Se não gostar, pede o reembolso.</div>
+    </div>
+    <div class="bf" id="bfOffer"></div>
+    <div class="req"><b>Requisito:</b> o gestor roda no Claude Code, então você precisa de um plano pago do Claude (contratado à parte, no site do Claude). Este produto é a pasta do gestor, não a assinatura.</div>
+    <div class="combo pv">
+      <p><b>Anuncia também no Facebook ou no Google?</b><br>Leve os 3 gestores por <b>R$ 147</b> <s>R$ 291</s>.</p>
+      <a href="[LINK CHECKOUT COMBO]">Ver o combo</a>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="kick">Para quem é</div>
+    <h2>Para quem anuncia e quer método, não achismo.</h2>
+    <div class="who">
+      <div><b>Gestor de tráfego</b><span>Monta e analisa as campanhas dos clientes em menos tempo, com uma pasta e um histórico para cada conta.</span></div>
+      <div><b>Agência</b><span>Um mesmo método para toda a equipe, com relatório em linguagem de cliente pelo <code>/relatorio</code>.</span></div>
+      <div><b>Dono de negócio</b><span>Grava com o celular sabendo o que falar nos primeiros 2 segundos, e entende cada decisão com os seus números.</span></div>
+    </div>
+  </section>
+
+  <section class="sec" id="faz">
+    <div class="kick">O que vem no arquivo</div>
+    <h2>Um gestor inteiro, dentro de uma pasta.</h2>
+    <p>Você baixa, abre no Claude Code e ele passa a trabalhar como o seu gestor de TikTok Ads.</p>
+    <div class="tree"><span class="h">tiktok-ads-com-claude/</span>
+├── CLAUDE.md          <span class="c"># como um gestor sênior pensa</span>
+├── .claude/commands/  <span class="c"># os 10 comandos</span>
+├── conhecimento/      <span class="c"># playbooks, estruturas, Smart+,</span>
+│                      <span class="c">#   Spark Ads, métricas e copy</span>
+├── meu-negocio/       <span class="c"># ticket, margem, CPA, tom de voz</span>
+├── historico/         <span class="c"># o que venceu, perdeu e ensinou</span>
+├── campanhas/         <span class="c"># cada campanha montada</span>
+├── criativos/         <span class="c"># seus vídeos e imagens</span>
+├── relatorios/        <span class="c"># o CSV exportado do Ads Manager</span>
+└── scripts/           <span class="c"># análise automática do relatório</span></div>
+    <div class="grid">
+      <div class="card"><code>/campanha</code><p>A campanha completa em 5 etapas, como na conversa acima, com você aprovando em 2 momentos.</p></div>
+      <div class="card"><code>/criativos</code><p>Ganchos dos 2 primeiros segundos e roteiros nativos em vários ângulos, metade derivada do que já venceu na sua conta.</p></div>
+      <div class="card"><code>/analisar</code><p>Lê o relatório (CSV ou print), olha a visualização de 2 s e 6 s, acha onde o funil quebra e diz o que pausar, manter, escalar e testar.</p></div>
+      <div class="card"><code>/legendas</code><p>Abre cada vídeo e imagem da pasta, avalia como anúncio e escreve o texto no tom da sua marca.</p></div>
+      <div class="card"><code>/escalar</code><p>Quando levar os vencedores para o Smart+, quanto aumentar e quando voltar atrás.</p></div>
+      <div class="card"><code>/relatorio</code> <code>/referencias</code><p>Relatório em linguagem de cliente e pesquisa de anúncios no Top Ads do Creative Center.</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="kick">O diferencial</div>
+    <h2>Ele aprende com a sua conta.</h2>
+    <p>Um chat comum esquece tudo na conversa seguinte. Este gestor guarda cada resultado em arquivos da pasta e lê esses arquivos antes de qualquer trabalho.</p>
+    <div class="learn">
+      <div><small>historico/vencedores.md</small>Os vídeos e ganchos que bateram a meta, com os números e o porquê.</div>
+      <div><small>historico/perdedores.md</small>O que foi pausado e o motivo, para não repetir.</div>
+      <div><small>historico/aprendizados.md</small>A lição de cada rodada em uma linha, com data.</div>
+    </div>
+  </section>
+
+  <section class="sec" id="como">
+    <div class="kick">Como funciona</div>
+    <h2>Do download à primeira campanha.</h2>
+    <ol class="steps">
+      <li><b>Compre e baixe a pasta</b><span>Na área de membros da Hotmart, com guia de instalação passo a passo.</span></li>
+      <li><b>Abra a pasta no Claude Code</b><span>No computador (Windows ou Mac), com o seu plano do Claude.</span></li>
+      <li><b>Ele se configura no primeiro uso</b><span>Em uns 10 minutos ele conhece o seu negócio e calcula as suas metas.</span></li>
+      <li><b>Peça a campanha</b><span>Como na conversa acima. Daí em diante, cada resultado vira histórico.</span></li>
+    </ol>
+  </section>
+
+  <section class="sec">
+    <div class="kick">Você no controle</div>
+    <h2>Ele trabalha. Você aprova.</h2>
+    <ul class="ctrl">
+      <li>Modo <b>Planejar</b>: ele entrega tudo pronto e você sobe no TikTok Ads Manager.</li>
+      <li>Modo <b>Operar</b>: com a extensão do Chrome, ele monta no TikTok Ads Manager já logado, sempre como rascunho.</li>
+      <li>Nada é publicado, pago ou aceito sem o seu "sim".</li>
+      <li>Ele nunca digita senha, cartão ou código.</li>
+    </ul>
+  </section>
+
+  <section class="sec" id="faq">
+    <div class="kick">Perguntas frequentes</div>
+    <h2>Antes de comprar.</h2>
+    <details><summary>Preciso pagar o Claude à parte?</summary><p>Sim. O gestor roda no Claude Code, que faz parte dos planos pagos do Claude. A assinatura é contratada direto no site do Claude, separada deste produto.</p></details>
+    <details><summary>Preciso saber programar?</summary><p>Não. Você conversa em português, como na simulação. A instalação tem um guia passo a passo, e qualquer dúvida você pode perguntar ao próprio gestor.</p></details>
+    <details><summary>Funciona no Windows e no Mac?</summary><p>Sim, nos dois. O trabalho é feito no computador.</p></details>
+    <details><summary>Preciso aparecer nos vídeos?</summary><p>Não. Ele escreve roteiros para você, para quem trabalha com você ou para criadores, e monta Spark Ads com posts de clientes que autorizarem. Se você só tiver fotos, ele monta carrossel.</p></details>
+    <details><summary>Funciona com o TikTok Shop?</summary><p>Sim. Para vender dentro do TikTok Shop ele usa a campanha GMV Max; para site, Hotmart, WhatsApp ou formulário, as campanhas de Vendas e de Leads.</p></details>
+    <details><summary>Ele mexe na minha conta sozinho?</summary><p>Não. No modo Planejar ele só entrega o material. No modo Operar ele monta como rascunho, e nada é publicado ou pago sem o seu "sim".</p></details>
+    <details><summary>Ele garante resultado?</summary><p>Não. Ninguém pode garantir resultado em anúncio. O que ele faz é aplicar método, decidir pelos números da sua conta e aprender com o histórico dela.</p></details>
+    <details><summary>Serve para quem gerencia várias contas?</summary><p>Sim. Use uma pasta por cliente: cada uma guarda o briefing e o histórico daquela conta.</p></details>
+    <details><summary>Faz post orgânico e trends para o perfil?</summary><p>Não. Ele é gestor de tráfego pago, não social media. Tudo o que escreve e avalia é para anúncio.</p></details>
+    <details><summary>Como recebo?</summary><p>Logo após a compra, na área de membros da Hotmart: a pasta (.zip) e o guia de instalação.</p></details>
+  </section>
+
+  <section class="sec" style="text-align:center">
+    <h2 class="pv">Seu gestor de tráfego, por R$ 97.</h2>
+    <a class="buy light pv" href="[LINK CHECKOUT TIKTOK]" style="margin-top:8px">Quero o meu gestor</a>
+    <h2 class="pnv">Seu gestor de tráfego está te esperando.</h2>
+    <a class="buy light pnv" href="#bfOffer" style="margin-top:8px">Raspar e revelar o meu preço</a>
+  </section>
+</main>
+
+<footer>
+  <p>TikTok Ads com Claude é um produto independente. Não é afiliado, patrocinado nem endossado pela Anthropic ou pelo TikTok. Claude é marca da Anthropic; TikTok é marca da ByteDance. O nome descreve a ferramenta usada.</p>
+  <p>A conversa no topo da página é uma simulação, com negócios, pessoas e números fictícios, para mostrar como o gestor trabalha. Resultados de anúncios dependem do produto, da oferta, da verba e de outros fatores. Não há promessa de resultado ou renda.</p>
+</footer>
+
+<div class="stick" id="stick"><div><b>TikTok Ads com Claude</b><span class="pv">R$ 97 na Black Friday · garantia de 7 dias</span><span class="pnv">Preço secreto de Black Friday</span></div><a class="pv" href="#oferta">Quero</a><a class="pnv" href="#bfOffer">Raspar</a></div>
+
+<script>
+(() => {
+const CHECKOUT = '[LINK CHECKOUT TIKTOK]';
+const $ = s => document.querySelector(s);
+const log = $('#log'), opts = $('#opts'), ph = $('#ph'), inp = $('#inp');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let fast = false, run = 0;
+
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const md = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`(.+?)`/g,'<code>$1</code>');
+const wait = ms => new Promise(r => setTimeout(r, (fast || reduce) ? 0 : ms));
+const down = () => { log.scrollTop = log.scrollHeight; };
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+const guard = id => { if (id !== run) throw 'stop'; };
+const tag = (t, k) => '<span class="tag t-' + k + '">' + t + '</span>';
+const progress = p => { $('#ringArc').style.strokeDashoffset = 97.4 * (1 - p/100); $('#ringTxt').textContent = Math.round(p); };
+
+async function reveal(node, id){
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+  const texts = []; let t; while ((t = walker.nextNode())) { texts.push([t, t.textContent]); t.textContent = ''; }
+  for (const [n, full] of texts){
+    for (let i = 0; i < full.length; i += 3){
+      guard(id);
+      if (fast || reduce){ n.textContent = full; break; }
+      n.textContent = full.slice(0, i + 3);
+      if (i % 30 === 0) down();
+      await new Promise(r => setTimeout(r, 12));
+    }
+  }
+  down();
+}
+async function think(id, secs, words){
+  words = (words && words.length ? words : ['Pensando']);
+  const th = el('div','think','<span class="dots"><i></i><i></i><i></i><i></i></span><span class="lbl"></span>');
+  log.appendChild(th); down(); inp.classList.add('busy');
+  const label = th.lastChild; let w = 0;
+  label.textContent = words[0] + '…';
+  const step = Math.max(900, secs * 1000 / words.length);
+  const timer = setInterval(() => { w = (w + 1) % words.length; label.textContent = words[w] + '…'; }, step);
+  await wait(secs * 1000); clearInterval(timer); guard(id); th.remove();
+}
+async function say(id, text){
+  const d = el('div','g'); d.innerHTML = text.split('\n\n').map(p => '<p>' + md(p).replace(/\n/g,'<br>') + '</p>').join('');
+  log.appendChild(d); await reveal(d, id); await wait(240); guard(id);
+}
+async function tools(id, summary, items){
+  const t = el('div','tools');
+  t.innerHTML = '<div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>' + summary + '</span><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div><ol></ol>';
+  const ol = t.querySelector('ol');
+  items.forEach(([a, b]) => ol.appendChild(el('li', null, esc(a) + (b ? '<span>⎿ ' + esc(b) + '</span>' : ''))));
+  t.addEventListener('click', () => t.classList.toggle('open'));
+  log.appendChild(t); down(); await wait(550); guard(id);
+}
+async function saved(id, path, note){
+  log.appendChild(el('div','saved','<span>✓</span><span>Salvo em <code>' + path + '</code>' + (note ? ' · ' + md(note) : '') + '</span>'));
+  down(); await wait(400); guard(id);
+}
+async function table(id, head, rows, cls){
+  const w = el('div','tbl');
+  w.innerHTML = '<table><thead><tr>' + head.map(h => '<th>' + h + '</th>').join('') + '</tr></thead><tbody>' +
+    rows.map((r, i) => '<tr' + (cls && cls[i] ? ' class="' + cls[i] + '"' : '') + '>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</tbody></table>';
+  log.appendChild(w); down(); await wait(800); guard(id);
+}
+async function html(id, cls, inner, ms){ log.appendChild(el('div', cls, inner)); down(); await wait(ms || 650); guard(id); }
+async function stage(id, n, nome, p){
+  $('#stageTxt').textContent = n ? 'Etapa ' + n + ' de 5 · ' + nome : nome;
+  if (p != null) progress(p);
+  await html(id, 'stage', n ? 'Etapa ' + n + ' · ' + esc(nome) : esc(nome), 250);
+}
+
+function choose(id, list, p, lbl){
+  if (p != null) progress(p);
+  fast = false; inp.classList.remove('busy','ready');
+  ph.textContent = $('#app').classList.contains('started') ? 'Responder ao gestor…' : 'Peça algo ao seu gestor…'; ph.classList.remove('typing');
+  return new Promise(resolve => {
+    opts.innerHTML = '';
+    const short = list.every(o => (o.s || o.t).length <= 30);
+    opts.className = 'sugs' + (short ? ' pills' : '');
+    opts.appendChild(el('div','lbl', lbl || (list.length > 1 ? 'Escolha o que responder' : 'Toque para enviar')));
+    list.forEach((o, i) => {
+      const b = el('button','opt' + (o.cta ? ' cta' : ''));
+      b.textContent = o.s || o.t; b.style.animationDelay = (i * 70) + 'ms';
+      b.onclick = async () => {
+        opts.innerHTML = ''; opts.className = 'sugs';
+        if (o.href){ document.querySelector(o.href).scrollIntoView({behavior: reduce ? 'auto' : 'smooth'}); }
+        ph.classList.add('typing');
+        const step = o.t.length > 60 ? 4 : 2;
+        for (let k = 1; k <= o.t.length; k += step){
+          ph.textContent = o.t.length > 90 && k > 90 ? '…' + o.t.slice(k - 90, k) : o.t.slice(0, k);
+          await new Promise(r => setTimeout(r, reduce ? 0 : 14));
+        }
+        inp.classList.add('ready');
+        await new Promise(r => setTimeout(r, reduce ? 0 : 260));
+        inp.classList.remove('ready'); ph.textContent = ''; ph.classList.remove('typing');
+        if (id !== run) return;
+        const hero = $('#hero'); if (hero) hero.remove(); $('#app').classList.add('started');
+        const u = el('div','u'); u.appendChild(el('div', null, esc(o.t))); log.appendChild(u); down();
+        resolve(o);
+      };
+      opts.appendChild(b);
+    });
+    requestAnimationFrame(down);
+  });
+}
+log.addEventListener('click', e => { if (!e.target.closest('.tools,.pitch,.unl,.bf,.offer')) fast = true; });
+
+const anuncio = a => '<div class="ah"><span>' + esc(a.tipo) + '</span><code>' + esc(a.nome) + '</code></div><div class="ab">' +
+  (a.nota ? '<div class="quote" style="margin-top:4px"><small>Como funciona</small>' + md(a.nota) + '</div>' : '') +
+  (a.rot ? '<div class="rot" style="margin-top:8px">' + a.rot.map(([t, c, f, x]) => '<div><b>' + t + '</b><p><i>CENA</i>' + fill(c) + '</p>' + (f ? '<p><i>FALA</i>' + fill(f) + '</p>' : '') + '<p><i>TELA</i>' + fill(x) + '</p></div>').join('') + '</div>' : '') +
+  '<div class="quote" style="margin-top:8px"><small>Texto do anúncio · até 100 caracteres</small>' + fill(a.texto) + ' <span class="cc' + (a.texto.length > 100 ? ' over' : '') + '">(' + a.texto.length + ')</span></div><div class="quote"><small>Botão</small>' + esc(a.cta) + '</div>' +
+  (a.som ? '<div class="quote"><small>Som</small>' + esc(a.som) + '</div>' : '') +
+  (a.zap ? '<div class="msg" style="margin:8px 0 0"><small>Mensagem que já chega escrita no WhatsApp</small>' + fill(a.zap) + '</div>' : '') + '</div>';
+
+/* ================= DADOS DA CONVERSA ================= */
+const brl = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+const fill = s => esc(s).replace(/\[(.+?)\]/g, '<span class="fill">[$1]</span>');
+const FAIXAS = [
+  {k:'b1', s:'R$ 10 a R$ 50 por dia', t:'Entre R$ 10 e R$ 50 por dia.', mid:30},
+  {k:'b2', s:'R$ 50 a R$ 100 por dia', t:'Entre R$ 50 e R$ 100 por dia.', mid:75},
+  {k:'b3', s:'R$ 100 a R$ 500 por dia', t:'Entre R$ 100 e R$ 500 por dia.', mid:250},
+  {k:'b4', s:'R$ 500 a R$ 1.000 por dia', t:'Entre R$ 500 e R$ 1.000 por dia.', mid:700},
+  {k:'b5', s:'Mais de R$ 1.000 por dia', t:'Mais de R$ 1.000 por dia.', mid:1500}
+];
+const TICKETS = [{s:'Até R$ 100',v:70},{s:'R$ 100 a R$ 500',v:250},{s:'R$ 500 a R$ 2.000',v:1000},{s:'Mais de R$ 2.000',v:3000}];
+const MARGENS = [{s:'Uns 30%',v:.3},{s:'Uns 50%',v:.5},{s:'Uns 70% ou mais',v:.75}];
+const EST = {
+  '1-1-1':{nome:'1-1-1'},
+  '1-1-5':{nome:'1-1-5'},
+  'esc':{nome:'Smart+ e teste'}
+};
+const CAP = [
+  {k:'C1', s:'Gravo vídeo com o celular', t:'Eu gravo vídeo com o celular.', fmt:'vídeo 9:16 nativo, gravado no celular'},
+  {k:'C0', s:'Só tenho fotos e imagens', t:'Não gravo vídeo. Tenho fotos e imagens.', fmt:'carrossel de fotos com música'},
+  {k:'C2', s:'Tenho equipe ou criadores', t:'Tenho equipe ou criadores de conteúdo que gravam pra mim.', fmt:'vídeo com criador (Spark Ads)'}
+];
+
+/* como o tráfego chega: independe do tipo de negócio */
+const DEST = {
+  site:{s:'Para o meu site ou página de vendas', t:'Mando para o meu site, onde a pessoa compra.', unidade:'venda', objetivo:'Vendas', evFinal:'Pagamento concluído', evAnterior:'Início da finalização de compra', destino:'a sua página, com preço e condições visíveis sem rolar',
+        checklist:'Pixel do TikTok e Events API registrando o pagamento concluído · UTM nos links · promessa do vídeo igual à da página · checkout testado no celular'},
+  zap:{s:'Para o meu WhatsApp', t:'Mando para o WhatsApp. A venda acontece na conversa.', unidade:'conversa', objetivo:'Leads → conversas no WhatsApp', destino:'o seu WhatsApp, com mensagem pronta por anúncio', cta:'Enviar mensagem',
+        checklist:'mensagem automática ligada · quem atende avisado sobre os 5 minutos · etiqueta para marcar quem veio do TikTok · catálogo ou tabela de preços pronta'},
+  form:{s:'Para um formulário de cadastro', t:'Capto o contato num formulário e vendo depois.', unidade:'cadastro', objetivo:'Leads → formulário instantâneo', destino:'formulário instantâneo com 2 perguntas que filtram curiosos', cta:'Cadastre-se',
+        checklist:'formulário instantâneo com 2 perguntas de qualificação · alguém para chamar o contato no mesmo dia · planilha ou CRM recebendo os cadastros'}
+};
+
+/* nichos: ideias concretas de anúncio */
+const NICHOS = {
+  estetica:{s:'Saúde e estética', t:'Trabalho com saúde e estética: clínica e procedimentos.', local:true, ctaSite:'Agendar agora', verbo:'agendar',
+    alerta:'⚠️ <b>Política (saúde e estética):</b> nada de antes e depois nem de "tem vergonha de…?". Eu falo do procedimento, da avaliação e de quem atende.',
+    objs:{
+      caro:{s:'Acham caro', t:'A maioria acha caro.', ang:'Objeção: preço', gancho:'"Por que a avaliação vem antes do preço?"', texto:'Cada rosto é diferente, e o valor depende do que você precisa. Por isso tudo começa com uma avaliação individual, sem compromisso de fechar.', titulo:'Avaliação antes do preço'},
+      medo:{s:'Têm medo ou receio', t:'Têm medo de doer ou de ficar artificial.', ang:'Objeção: medo', gancho:'"Dói? Vou te responder com sinceridade."', texto:'"Dói?" É a pergunta que eu mais ouço. No vídeo eu explico o que você sente em cada etapa, sem enrolação.', titulo:'Dói? A resposta sincera'},
+      confia:{s:'Não conhecem a clínica', t:'Não conhecem a clínica e ficam inseguras.', ang:'Objeção: confiança', gancho:'A profissional abre a porta da clínica: "Vem conhecer quem vai cuidar de você."', texto:'Antes de agendar, conheça quem vai te atender: a formação, a estrutura da clínica e como é o primeiro atendimento.', titulo:'Conheça quem vai te atender'}
+    },
+    ideias:[['Autoridade','A profissional explica em 30 s o procedimento e para quem ele NÃO é indicado'],['Bastidor','Tour de 15 s: recepção, sala e equipamentos, sem fala'],['Prova','Paciente contando como foi a experiência (sem antes e depois)'],['Oferta','"Horários de sábado abertos este mês"']],
+    prova:{texto:'"[Frase real de uma paciente sobre o atendimento]." Agende a sua avaliação.', titulo:'Quem já veio recomenda'}},
+  beleza:{s:'Beleza e cosméticos', t:'Vendo produtos de beleza e cosméticos.', local:false, ctaSite:'Comprar agora', verbo:'comprar',
+    alerta:'⚠️ <b>Política:</b> nada de antes e depois da pele nem de "acabe com as suas manchas" (fala de característica da pessoa). Eu falo do produto, da textura e da rotina.',
+    objs:{
+      serve:{s:'Não sabem se serve pra elas', t:'Não sabem se o produto serve pra pele delas.', ang:'Objeção: "serve pra mim?"', gancho:'"Pele oleosa, seca ou mista? Em 10 segundos você descobre a sua."', texto:'Descubra o seu tipo de pele em 10 segundos e veja qual produto da linha foi feito para ela.', titulo:'Qual é o seu tipo de pele?'},
+      caro:{s:'Acham caro', t:'Acham caro.', ang:'Objeção: preço', gancho:'"Por que um sérum bom custa mais? Olha o rótulo."', texto:'A diferença entre um sérum barato e um bom está na fórmula. No carrossel, os 3 ativos que fazem diferença e onde eles aparecem no rótulo.', titulo:'O que olhar no rótulo'},
+      confia:{s:'Desconfiam de loja online', t:'Desconfiam de comprar numa loja que não conhecem.', ang:'Objeção: confiança', gancho:'Unboxing real: "É assim que o seu pedido chega."', texto:'Do pedido à sua porta: veja como embalamos, o prazo de entrega e o que as clientes dizem quando recebem.', titulo:'Veja como chega o seu pedido'}
+    },
+    ideias:[['Curiosidade','Carrossel: "A ordem certa do skincare (quase todo mundo erra a 3ª)"'],['Demonstração','Close na textura do produto na pele, sem fala, com texto grande'],['Prova','Print de avaliação 5 estrelas, ampliado'],['Rotina','"Minha rotina da manhã em 30 segundos" usando os produtos da loja']],
+    prova:{texto:'⭐⭐⭐⭐⭐ "[Avaliação real de uma cliente]." Veja por que esse é o mais pedido da loja.', titulo:'O que as clientes dizem'}},
+  moda:{s:'Moda e acessórios', t:'Vendo moda e acessórios.', local:false, ctaSite:'Comprar agora', verbo:'comprar',
+    alerta:'⚠️ <b>Política:</b> evite falar do corpo da pessoa ("disfarça a barriga"). Fale da peça, do tecido e do caimento.',
+    objs:{
+      tamanho:{s:'Têm dúvida no tamanho', t:'Têm dúvida se o tamanho vai servir.', ang:'Objeção: tamanho', gancho:'"Tenho 1,60 m e visto M: olha o caimento."', texto:'Medidas reais e provador de verdade: veja o caimento em quem tem o seu tamanho antes de comprar.', titulo:'Veja o caimento antes de comprar'},
+      caro:{s:'Acham caro', t:'Acham caro.', ang:'Objeção: preço', gancho:'"1 peça, 3 looks: trabalho, fim de semana e noite."', texto:'Uma peça, três ocasiões. No vídeo, os 3 looks montados com ela.', titulo:'1 peça, 3 looks'},
+      frete:{s:'Desistem no frete', t:'Desistem quando veem o frete.', ang:'Objeção: frete', gancho:'"O frete aparece aqui, antes do carrinho."', texto:'Frete e prazo calculados na própria página da peça: você sabe o valor final antes de ir para o carrinho.', titulo:'Sem surpresa no carrinho'}
+    },
+    ideias:[['Provador','Vídeo no provador mostrando a peça em movimento'],['Prova','Cliente marcando a loja usando a peça'],['Curiosidade','"A peça que mais esgota aqui na loja"'],['Oferta','Coleção nova em carrossel, com o preço em cada card']],
+    prova:{texto:'"[Comentário real de uma cliente que comprou]." A peça voltou ao estoque.', titulo:'Voltou ao estoque'}},
+  comida:{s:'Alimentação (delivery, restaurante, doces)', t:'Trabalho com alimentação.', local:true, ctaSite:'Pedir agora', verbo:'pedir',
+    alerta:'⚠️ <b>Atenção:</b> não prometa prazo de entrega que você não cumpre em horário de pico. Isso vira comentário negativo no próprio anúncio.',
+    objs:{
+      caro:{s:'Acham caro', t:'Acham caro comparado com outros lugares.', ang:'Objeção: preço', gancho:'"Por que o nosso prato mais pedido custa o que custa."', texto:'Ingrediente fresco, feito na hora. No vídeo, a cozinha preparando o prato mais pedido da casa, do começo ao fim.', titulo:'Feito na hora, na sua frente'},
+      demora:{s:'Têm medo de demorar', t:'Têm medo de a entrega demorar.', ang:'Objeção: demora', gancho:'"Do pedido à sua porta: cronometramos."', texto:'Fizemos o teste: do pedido à entrega, cronometrado. Veja no vídeo quanto tempo levou.', titulo:'Cronometramos a entrega'},
+      conhece:{s:'Não conhecem a casa', t:'Ainda não conhecem a casa.', ang:'Objeção: primeira vez', gancho:'"Primeira vez aqui? Comece por este."', texto:'Primeira vez? Esse é o prato que a maioria pede de novo. Experimente.', titulo:'Comece pelo mais pedido'}
+    },
+    ideias:[['Desejo','Close em câmera lenta do prato sendo servido, sem fala'],['Bastidor','A cozinha às 11 h, preparando os pedidos do almoço'],['Prova','Print de avaliação no app de delivery, ampliado'],['Oferta','"Combo da semana" com o preço na tela']],
+    prova:{texto:'"[Avaliação real de um cliente]." Peça o seu.', titulo:'Quem pede, pede de novo'}},
+  educacao:{s:'Educação e cursos online', t:'Vendo cursos e conteúdo online.', local:false, ctaSite:'Saiba mais', verbo:'se inscrever',
+    alerta:'⚠️ <b>Política:</b> "renda garantida" e "ganhe R$ X por mês" são promessa de renda e costumam ser reprovados. Eu escrevo sobre habilidade, processo e preço.',
+    objs:{
+      caro:{s:'Acham caro', t:'Acham caro.', ang:'Objeção: preço', gancho:'"Quanto custa continuar aprendendo sozinho, por tentativa e erro?"', texto:'Aprender sozinho parece de graça até você somar o tempo perdido. No curso, o caminho já vem organizado, do zero ao primeiro resultado.', titulo:'O caminho já organizado'},
+      tempo:{s:'Acham que não têm tempo', t:'Dizem que não têm tempo.', ang:'Objeção: tempo', gancho:'"Aulas curtas. Dá pra fazer no horário do almoço."', texto:'Aulas curtas, para assistir no celular, no seu horário. Veja como é uma aula por dentro.', titulo:'Cabe no seu horário de almoço'},
+      naoeh:{s:'Acham que não é pra elas', t:'Acham que não é pra elas.', ang:'Objeção: "não é pra mim"', gancho:'"Eu também achava que não era pra mim."', texto:'Ela começou do zero e também achava que não era pra ela. Veja como foi a primeira semana no curso.', titulo:'Também achava que não era pra mim'}
+    },
+    ideias:[['Dor','"O erro que todo iniciante comete (e eu cometi por 2 anos)"'],['Demonstração','A área de membros por dentro: módulos, aulas e materiais em 20 s'],['Prova','Aluno mostrando o primeiro resultado, sem prometer renda'],['Autoridade','Você contando em 30 s como chegou até aqui']],
+    prova:{texto:'"[Frase real de um aluno]." Veja o que tem dentro do curso.', titulo:'O que os alunos dizem'}},
+  fitness:{s:'Fitness e bem-estar', t:'Trabalho com fitness e bem-estar: academia, personal ou nutrição.', local:true, ctaSite:'Agendar agora', verbo:'agendar',
+    alerta:'⚠️ <b>Política (corpo e saúde):</b> nada de antes e depois nem de frases sobre o corpo da pessoa. Eu falo de rotina, disposição e acompanhamento.',
+    objs:{
+      tempo:{s:'Acham que não têm tempo', t:'Dizem que não têm tempo.', ang:'Objeção: tempo', gancho:'"Treino de 30 minutos, 3 vezes por semana. Olha como é."', texto:'30 minutos, 3 vezes por semana, com acompanhamento. Veja no vídeo como é um treino do começo ao fim.', titulo:'30 minutos, 3 vezes por semana'},
+      vergonha:{s:'Têm receio de começar', t:'Têm receio de começar do zero.', ang:'Objeção: começar do zero', gancho:'"Primeiro dia aqui: o que acontece de verdade."', texto:'Nunca treinou? O primeiro dia é uma conversa e uma avaliação, no seu ritmo. Veja como funciona.', titulo:'Como é o primeiro dia'},
+      caro:{s:'Acham caro', t:'Acham caro.', ang:'Objeção: preço', gancho:'"Quanto sai cada treino? Fiz a conta."', texto:'Dividindo o plano pelos treinos do mês, veja quanto sai cada um. A conta está no vídeo.', titulo:'Quanto sai cada treino'}
+    },
+    ideias:[['Bastidor','Tour de 15 s pelo espaço, num horário vazio'],['Autoridade','Professor corrigindo um erro comum de exercício em 20 s'],['Prova','Aluno contando como se sente depois de 3 meses, sem antes e depois'],['Oferta','"Aula experimental: agende a sua"']],
+    prova:{texto:'"[Frase real de um aluno sobre a rotina]." Agende a sua aula experimental.', titulo:'Quem treina aqui conta'}},
+  outro:{s:'Outro', t:'O meu segmento é outro.', local:false, ctaSite:'Saiba mais', verbo:'saber mais',
+    alerta:'⚠️ <b>Política:</b> nada de antes e depois, de resultado garantido ou de frases sobre características da pessoa. Eu reviso cada texto antes de subir.',
+    objs:{
+      caro:{s:'Acham caro', t:'A maioria acha caro.', ang:'Objeção: preço', gancho:'"Por que custa o que custa? Te mostro em 30 segundos."', texto:'Antes de achar caro, veja o que está incluído e quanto você deixa de gastar resolvendo isso do jeito certo.', titulo:'O que está incluído no preço'},
+      confia:{s:'Não conhecem a empresa', t:'Não conhecem a empresa e ficam inseguros.', ang:'Objeção: confiança', gancho:'"Quem está por trás: 15 segundos de bastidor."', texto:'Antes de comprar, veja quem faz, como funciona e o que os clientes dizem.', titulo:'Conheça quem faz'},
+      depois:{s:'Deixam para depois', t:'Gostam, mas deixam pra depois.', ang:'Objeção: adiar', gancho:'"Se você pensa nisso há meses, este vídeo é pra você."', texto:'Você já pesquisou, já comparou e continua adiando. Veja como é o primeiro passo.', titulo:'O primeiro passo é simples'}
+    },
+    ideias:[['Demonstração','O produto ou serviço em uso já nos 3 primeiros segundos, sem introdução'],['Bastidor','15 segundos mostrando como é feito ou entregue'],['Prova','Cliente real contando como foi (sem prometer resultado)'],['Oferta','O que vem incluído, item por item, com o preço na tela']],
+    prova:{texto:'"[Frase real de um cliente]." Veja como funciona.', titulo:'O que os clientes dizem'}}
+};
+
+/* TikTok: ganchos dos 2 primeiros segundos (variação do vencedor) e textos de anúncio de até 100 caracteres */
+const TT = {
+  estetica:{ganchos:[['A profissional já falando, sem "oi, gente"','"Esse procedimento não é pra todo mundo."','NÃO É PRA TODO MUNDO'],['Mão com luva segurando a seringa, de perto','"3 perguntas que eu faço antes de qualquer aplicação."','ANTES DE APLICAR'],['A profissional olhando para a câmera, braços cruzados','"Eu digo não pra muita gente. Te explico por quê."','EU DIGO NÃO']],
+    var:'Antes de agendar, veja para quem esse procedimento não é indicado.', teste:'Por que a avaliação vem antes do preço? Agende a sua sem compromisso.'},
+  beleza:{ganchos:[['Mão passando o produto no rosto, já em movimento','"Você tá passando o sérum na ordem errada."','ORDEM ERRADA?'],['Mão tirando 1 de 4 frascos da bancada','"Esse aqui sai da sua rotina hoje."','QUAL SAI?'],['Close no rótulo, dedo apontando','"A 3ª etapa quase todo mundo erra."','A 3ª ETAPA']],
+    var:'A ordem certa do skincare em 30 segundos. Você erra a 3ª etapa?', teste:'Pele oleosa, seca ou mista? Descubra a sua e veja o produto certo.'},
+  moda:{ganchos:[['Giro no provador, já com a peça em movimento','','A PEÇA EM MOVIMENTO'],['Selfie no espelho do provador','"Achei a peça que serve em tudo."','SERVE EM TUDO'],['Três cabides na mão, P, M e G','"Provei os 3 tamanhos pra você não errar."','P, M OU G?']],
+    var:'A peça em movimento, no provador de verdade. Veja o caimento.', teste:'Tenho 1,60 m e visto M. Veja o caimento antes de escolher o seu.'},
+  comida:{ganchos:[['Close em câmera lenta do prato sendo servido, sem fala','','O MAIS PEDIDO DA CASA'],['A mão fechando a embalagem do pedido','"Esse é o que mais sai às sextas."','O QUE MAIS SAI'],['Som do preparo, bem de perto','','SAINDO AGORA']],
+    var:'Saindo agora. Peça o mais pedido da casa.', teste:'Feito na hora, com ingrediente fresco. Veja o mais pedido da casa sendo preparado.'},
+  educacao:{ganchos:[['Você já falando, apontando para a câmera','"Se você está começando, para de fazer isso."','PARA DE FAZER ISSO'],['Você balançando a cabeça, rindo de si','"Eu cometi esse erro por 2 anos."','2 ANOS ERRANDO'],['Tela do computador com um X vermelho','"O erro nº 1 de quem começa sozinho."','O ERRO Nº 1']],
+    var:'O erro que todo iniciante comete, e como evitar desde o primeiro dia.', teste:'Quanto custa aprender sozinho? Veja o caminho já organizado, do zero.'},
+  fitness:{ganchos:[['Porta abrindo, a câmera entrando no espaço vazio','','ANTES DE TODO MUNDO CHEGAR'],['O professor de frente, já falando','"Esse é o horário mais tranquilo daqui."','O HORÁRIO MAIS TRANQUILO'],['Tênis amarrando, de perto','"Vem conhecer antes da sua primeira aula."','A SUA 1ª AULA']],
+    var:'Vem conhecer o espaço antes da sua primeira aula.', teste:'30 minutos, 3 vezes por semana, com acompanhamento. Veja um treino inteiro.'},
+  outro:{ganchos:[['O produto ou serviço em uso já no primeiro quadro','','—'],['Você segurando o produto, de frente','"Isso aqui resolve [o problema] em 10 segundos."','EM 10 SEGUNDOS'],['Mão colocando o produto na mesa, de perto','"Você ainda faz isso do jeito difícil?"','DO JEITO DIFÍCIL?']],
+    var:'Veja funcionando, sem introdução. Toque para saber mais.', teste:'Por que custa o que custa? Veja tudo o que está incluído.'}
+};
+
+/* ================= ROTEIRO: a campanha DA PESSOA ================= */
+async function main(id){
+  progress(0); $('#stageTxt').textContent = 'Gestor de tráfego';
+  await choose(id, [{t:'Monta uma campanha pra mim.'}], 0, ' ');
+  await think(id, 1.6, ['Abrindo a sua pasta','Lendo o método']);
+  await say(id, 'Bora. Uma campanha comigo tem **5 etapas**, e você aprova em 2 momentos: depois da estratégia e depois das ideias de anúncio. Tudo com os **seus** números.\n\nPrimeiro: qual é o seu segmento?');
+  const nk = (await choose(id, Object.entries(NICHOS).map(([k, n]) => ({k, s:n.s, t:n.t})), 3)).k;
+  const NI = NICHOS[nk], TN = TT[nk];
+  await think(id, 1, ['Anotando']);
+  await say(id, 'E para onde você quer mandar quem toca no anúncio?');
+  const dk = (await choose(id, Object.entries(DEST).map(([k, d]) => ({k, s:d.s, t:d.t})), 5)).k;
+  const D = DEST[dk];
+  await think(id, 1, ['Anotando']);
+  await say(id, 'Quanto você pretende investir por dia?');
+  const fk = (await choose(id, FAIXAS.map(f => ({k:f.k, s:f.s, t:f.t})), 7)).k;
+  const F = FAIXAS.find(f => f.k === fk), V = F.mid;
+
+  /* ---------- 1. diagnóstico ---------- */
+  await stage(id, 1, 'diagnóstico', 9);
+  await think(id, 1.4, ['Lendo os playbooks','Separando as perguntas']);
+  await tools(id, 'Leu 2 arquivos', [['Read(conhecimento/playbooks.md)','diagnóstico do negócio'],['Read(conhecimento/diagnostico-metricas.md)','fórmulas e regras de decisão']]);
+  await say(id, 'Agora os números. Quanto custa o que você mais vende?');
+  const T = await choose(id, TICKETS.map(x => ({s:x.s, t:'Custa ' + x.s.replace('Até','até').replace('Mais de','mais de') + '.', v:x.v})), 12);
+  await say(id, 'E de cada venda, quanto sobra depois de custos e taxas?');
+  const M = await choose(id, MARGENS.map(x => ({s:x.s, t:'Sobra ' + x.s.toLowerCase() + '.', v:x.v})), 15);
+  let taxa = 1, taxaEst = false;
+  if (dk !== 'site'){
+    await say(id, 'De cada 10 ' + (dk === 'zap' ? 'pessoas que chamam no WhatsApp' : 'cadastros') + ', quantas viram cliente?');
+    const tx = await choose(id, [{s:'1 em cada 10', t:'Umas 1 em cada 10.', v:.1},{s:'3 em cada 10', t:'Umas 3 em cada 10.', v:.3},{s:'Não sei', t:'Nunca contei.', v:.15, est:1}], 18);
+    taxa = tx.v; taxaEst = !!tx.est;
+  }
+  const max = T.v * M.v, alvo = Math.round(max * .6);
+  const unit = dk === 'site' ? alvo : Math.max(1, Math.round(alvo * taxa));
+  const pUnit = unit;
+  const un = D.unidade, uLbl = dk === 'site' ? 'CPA' : 'Custo por ' + un;
+  const ok = Object.keys(NI.objs)[0], O = NI.objs[ok];
+  await say(id, 'Agora eu preciso ver o que você já fez, para não começar do zero. Me dá acesso ao seu TikTok Ads Manager? Eu só leio: não altero nada sem o seu "sim".');
+  await choose(id, [{k:'ger', s:'Dar acesso ao meu TikTok Ads Manager', t:'Te dou acesso ao meu TikTok Ads Manager. Vê o que já funcionou.'}], 20);
+  await think(id, 3.6, ['Abrindo o seu TikTok Ads Manager','Lendo as campanhas dos últimos 90 dias','Medindo os 2 primeiros segundos de cada vídeo','Lendo os comentários dos anúncios']);
+  await tools(id, 'Leu a sua conta pelo Chrome (só leitura)', [['Abrir(TikTok Ads Manager)','a sua conta, já logada no navegador'],['Ler(campanhas dos últimos 90 dias)','9 campanhas · 38 anúncios'],['Ler(visualização de 2 s e 6 s)','38 vídeos'],['Ler(comentários dos anúncios)','486 comentários']]);
+  await say(id, 'Li a sua conta: **9 campanhas e 38 anúncios** dos últimos 90 dias, com quanto cada vídeo segurou de gente nos 2 primeiros segundos. Vou usar isso em cada etapa: na estrutura, no público e nos anúncios.\n\nJá adianto: nos comentários, a dúvida que mais aparece é **' + O.s.toLowerCase() + '**.');
+  await html(id, 'file', '<div class="fh">historico/</div><pre><span class="add">+ metricas-da-conta.md · médias dos últimos 90 dias, com visualização de 2 s e 6 s</span>\n<span class="add">+ vencedores.md · os vídeos e campanhas que bateram a meta</span>\n<span class="add">+ aprendizados.md · dúvida nº 1 nos comentários: ' + esc(O.s.toLowerCase()) + '</span></pre>', 800);
+  await html(id, 'alert', 'Eu só li a sua conta. Não alterei nada, e nada muda nela sem o seu "sim".', 400);
+  await say(id, 'Que tipo de criativo você consegue produzir esta semana? (Na sua conta, vídeo gravado no celular, com gente falando, segurou mais gente nos 2 primeiros segundos que vídeo editado.)');
+  const ck = (await choose(id, CAP.map(c => ({k:c.k, s:c.s, t:c.t})), 24)).k;
+  const C = CAP.find(c => c.k === ck);
+  if (ck === 'C0'){
+    await think(id, 1, ['Anotando']);
+    await say(id, 'Dá para começar com fotos: eu monto **carrossel com música** e coloco o gancho na primeira foto. E te deixo um roteiro de 15 s para gravar com o celular quando der, porque no TikTok o vídeo nativo costuma render mais.');
+  }
+
+  await think(id, 3.2, ['Salvando o seu briefing','Calculando o seu CPA','Conferindo o volume da verba']);
+  const sem = Math.round(V * 7 / unit);
+  await tools(id, 'Fez a conta da verba', [['Read(meu-negocio/briefing.md)','segmento, destino, ticket, margem e criativo'],['Calcular(CPA máximo = ticket × margem)', brl(T.v) + ' × ' + Math.round(M.v * 100) + '% = ' + brl(max)]]);
+  const conta = [['Ticket', brl(T.v)],['Margem', Math.round(M.v * 100) + '%'],['<b>CPA máximo</b> (lucro zero)','<b>' + brl(max) + '</b>'],['<b>CPA alvo</b>','<b>' + brl(alvo) + '</b>']];
+  let evento, txtEvento;
+  if (dk !== 'site'){
+    conta.push([(dk === 'zap' ? 'Conversa' : 'Cadastro') + ' → cliente', Math.round(taxa * 100) + '%' + (taxaEst ? ' (estimativa)' : '')],['<b>Custo alvo por ' + un + '</b>','<b>' + brl(unit) + '</b>'],[un[0].toUpperCase() + un.slice(1) + 's por semana: ' + brl(V) + ' × 7 ÷ ' + brl(unit),'≈ ' + sem]);
+    evento = dk === 'zap' ? 'Conversa iniciada' : 'Formulário enviado';
+    txtEvento = 'A venda acontece depois, ' + (dk === 'zap' ? 'na conversa' : 'no contato com o cadastro') + ', e o TikTok não vê. Então eu otimizo para **' + un + 's**: umas ' + sem + ' por semana' + (sem < 15 ? '. É pouco volume, então eu concentro tudo em 1 grupo de anúncios para o algoritmo aprender mais rápido.' : (sem > 250 ? '. Com esse volume, o gargalo passa a ser o atendimento: vai precisar de gente para responder rápido.' : ', volume bom para o algoritmo aprender.')) + (taxaEst ? '\n\nComo você não sabe quantos viram cliente, usei 15% como estimativa. A partir de hoje, marque quem veio do TikTok e quem comprou, e eu recalculo com os seus números.' : '');
+  } else {
+    conta.push(['Vendas por semana: ' + brl(V) + ' × 7 ÷ ' + brl(alvo),'≈ ' + sem]);
+    if (sem >= 30){ evento = D.evFinal; txtEvento = 'Com umas ' + sem + ' vendas por semana, dá para otimizar **direto para Pagamento concluído**.'; }
+    else if (sem >= 10){ evento = D.evFinal; txtEvento = 'Umas ' + sem + ' vendas por semana: dá para otimizar para **Pagamento concluído**, mas o aprendizado é mais lento. Por isso eu não vou dividir a verba em muitos grupos.'; }
+    else { evento = D.evAnterior; txtEvento = (sem < 1 ? 'Menos de 1 venda por semana' : 'Umas ' + sem + ' vendas por semana') + ' é pouco para o algoritmo aprender otimizando para a compra. Nas 2 primeiras semanas eu otimizo para **' + D.evAnterior + '**, que acontece mais vezes, e troco para Pagamento concluído quando juntarmos 15 a 20 vendas.' + (sem < 2 ? '\n\nPara esse ticket, a verba está baixa para venda direta. Vale considerar mandar para o WhatsApp ou para um formulário e vender na conversa.' : ''); }
+  }
+  await table(id, ['A sua conta da verba','Valor'], conta);
+  await say(id, '**Diagnóstico:** ' + NI.s + ' · tráfego para ' + {site:'site',zap:'WhatsApp',form:'formulário'}[dk] + ' · ' + F.s + ' · ' + C.fmt + '.\n\n' + txtEvento);
+
+  /* ---------- 2. estratégia ---------- */
+  await stage(id, 2, 'estratégia', 30);
+  await think(id, 2.8, ['Voltando ao seu Ads Manager','Comparando as campanhas que você já rodou']);
+  const objName = {site:'Vendas', zap:'Leads (WhatsApp)', form:'Leads (formulário)'}[dk];
+  await say(id, 'Olhei no seu Ads Manager **qual tipo de campanha trouxe ' + un + ' mais barata**:');
+  await table(id, ['O que você já rodou', uLbl, 'Leitura'], [
+    [objName + ' · 1 grupo amplo · 5 vídeos nativos', brl(pUnit * .85), tag('MELHOR','ok')],
+    [objName + ' · 4 grupos de interesse', brl(pUnit * 1.4), tag('VERBA DIVIDIDA','warn')],
+    ['Promover pelo app', 'muitas visualizações, ' + brl(pUnit * 3), tag('OTIMIZA VISUALIZAÇÃO','bad')]
+  ]);
+  const st = V >= 300 ? 'esc' : (V >= 50 ? '1-1-5' : '1-1-1');
+  await say(id, {
+    '1-1-5':'Então eu **repito o que funcionou**: ' + objName + ', 1 grupo de anúncios com público amplo e 5 vídeos nativos (1-1-5). Nada de promover pelo app e nada de dividir a verba em muitos grupos.',
+    '1-1-1':'O que funcionou foi o grupo amplo no objetivo certo. Com ' + brl(V) + '/dia, eu repito isso no formato mais enxuto (1-1-1): 1 vídeo vencedor e 2 reservas para quando ele cansar.',
+    'esc':'O que funcionou foi o grupo amplo com vídeos nativos. Com ' + brl(V) + '/dia, eu separo em duas: uma campanha **Smart+** que escala os vídeos que já venceram, com público e orçamento automáticos, e uma de **teste** manual com ideias novas.'
+  }[st]);
+  await think(id, 3.4, ['Montando o mapa da campanha','Definindo público e orçamento','Calculando corte e escala']);
+  await tools(id, 'Leu 2 arquivos', [['Read(conhecimento/estruturas.md)', EST[st].nome + ' · nomes e orçamento'],['Read(conhecimento/tiktok-ads.md)','Smart+, Spark Ads, públicos e políticas']]);
+  const cod = '2311_' + {site:'VENDAS',zap:'ZAP',form:'LEADS'}[dk];
+  const publico = NI.local ? (V >= 500 ? 'a sua cidade e as vizinhas · público amplo, 18+' : 'a sua cidade · público amplo, 18+') : 'Brasil · público amplo, 18+, sem interesses';
+  const corte = 'gastou ' + brl(unit * 2) + ' sem ' + un + ' → pausar · visualização de 2 s abaixo de 25% → refazer o começo do vídeo';
+  const escala = (dk === 'site' ? 'CPA até ' + brl(alvo) : un + ' até ' + brl(unit)) + ' por 3 dias → ' + (V >= 500 ? '+20 a 30% a cada 48–72 h' : '+20% na verba');
+  const objEv = D.objetivo + (dk === 'site' ? ' · evento ' + evento : '');
+  let mapa;
+  if (st === 'esc'){
+    const pE = V >= 1000 ? .7 : .8, pR = V >= 1000 ? .1 : 0;
+    mapa = [['Campanha 1 · Smart+','<code>' + cod + '_SMART</code><br>' + objEv + ' · ' + brl(V * pE) + '/dia · público, orçamento e posicionamento automáticos · 6 vídeos vencedores, Spark Ads incluídos'],
+            ['Campanha 2 · teste','<code>' + cod + '_TESTE</code><br>manual 1-3-1 · ' + brl(V * .2) + '/dia · 3 grupos, 1 ideia nova em cada, toda semana']];
+    if (pR) mapa.push(['Campanha 3 · remarketing','<code>' + cod + '_RMK</code><br>' + brl(V * pR) + '/dia · quem assistiu 6 s ou mais e ainda não ' + (dk === 'site' ? 'comprou' : 'chamou')]);
+  } else {
+    mapa = [['Campanha','<code>' + cod + '</code><br>' + objEv + ' · ' + brl(V) + '/dia na campanha'],
+            ['Grupo de anúncios', publico]];
+  }
+  mapa.push(['Destino', D.destino]);
+  mapa.push(['Anúncios', {'1-1-1':'1 vídeo principal + 2 reservas para quando cansar','1-1-5':'5 vídeos diferentes no mesmo grupo, cada um com o seu gancho','esc':'6 vídeos no Smart+; o teste recebe ideias novas toda semana' + (V >= 1000 ? ' (15 ou mais por mês)' : '')}[st]]);
+  mapa.push([tag('CORTE','bad'), corte]);
+  mapa.push([tag('ESCALA','ok'), escala + (st === 'esc' ? ' · vencedor do teste entra no Smart+' : '')]);
+  await say(id, '**A sua estratégia** ⏸ (primeira aprovação):');
+  await table(id, ['Nível','Configuração'], mapa);
+  await say(id, '**O que esta campanha vai testar:**\n• H1: responder "' + O.s.toLowerCase() + '" logo nos 2 primeiros segundos traz ' + un + ' mais barata que a oferta direta.\n• H2: ' + (C.k === 'C0' ? 'carrossel com o gancho na 1ª foto supera a foto única.' : (C.k === 'C2' ? 'Spark Ad do criador, com os comentários do post, supera o vídeo do perfil da marca.' : 'você falando para a câmera nos 2 primeiros segundos supera o vídeo editado.')) + '\n\nAprova a estratégia? Ainda dá para trocar a estrutura.');
+  await choose(id, [{t:'Aprovo.'}], 44);
+
+  /* ---------- 3. ideias ---------- */
+  await stage(id, 3, 'ideias de anúncio', 50);
+  await think(id, 3.8, ['Lendo a sua objeção','Medindo os ganchos que já funcionaram','Escrevendo os começos de 2 segundos']);
+  await tools(id, 'Leu 3 arquivos', [['Read(meu-negocio/briefing.md)','objeção: ' + O.s.toLowerCase() + ' · formato: ' + C.fmt],['Read(conhecimento/criativos-copy.md)','ganchos de 2 s, ângulos e roteiro curto'],['Read(conhecimento/biblioteca-anuncios.md)','padrões do Top Ads do Creative Center']]);
+  const W1 = NI.ideias[0], W2 = NI.ideias.find(x => x[0] === 'Prova') || NI.ideias[2];
+  await say(id, 'Antes de criar qualquer coisa, olhei **os anúncios que já funcionaram** na sua conta:');
+  await table(id, ['Anúncio que já rodou', uLbl, 'Vis. 2 s', 'Vis. 6 s'], [
+    [W1[0] + ' · ' + esc(W1[1]), brl(pUnit * .8), '41%', '22%'],
+    [W2[0] + ' · Spark Ad do post de um cliente', brl(pUnit * .9), '38%', '19%'],
+    ['Vídeo editado, com música e o logo no começo', brl(pUnit * 1.7), '17% ' + tag('GANCHO FRACO','bad'), '6%']
+  ]);
+  await say(id, 'No TikTok, o anúncio se decide nos **2 primeiros segundos**. Os seus vencedores seguram 4 em cada 10 pessoas depois de 2 s; o vídeo editado, com o logo no começo, perde mais de 8 em cada 10.\n\nEntão eu sigo o **90/10**: 90% da verba em variações do que já vendeu, com começos novos, e 10% testando uma ideia nova, que responde a dúvida nº 1 dos comentários.');
+  const banco = [
+    ['Variação', W1[0] + ': mesmo vídeo, 3 ganchos novos nos 2 primeiros segundos', 'vencedor · ' + brl(pUnit * .8)],
+    ['Spark Ad', W2[0] + ': o post do cliente, impulsionado com o perfil e os comentários dele', 'vencedor · ' + brl(pUnit * .9)],
+    ['Variação', W1[0] + ': mesmo roteiro, outra pessoa falando', 'vencedor'],
+    ['Variação', W2[0] + ': versão de 15 s, com o produto no primeiro segundo', 'vencedor'],
+    ['Novo teste (10%)', O.gancho, 'dúvida nº 1 dos comentários']
+  ];
+  const nIdeias = {'1-1-1':3,'1-1-5':5,'esc':5}[st];
+  const ideias = (nIdeias === 3 ? [banco[0], banco[1], banco[4]] : banco).map((r, i) => [String(i + 1), r[0], fill(r[1]), r[2]]);
+  await table(id, ['#','Tipo','Anúncio','Origem'], ideias);
+  await say(id, 'Aprova? ⏸');
+  await choose(id, [{t:'Aprovo.'}], 58);
+
+  /* ---------- 4. anúncios ---------- */
+  await stage(id, 4, 'anúncios prontos', 66);
+  await think(id, 4.2, ['Escrevendo os ganchos','Roteirizando os vídeos','Contando os caracteres']);
+  await say(id, 'Os anúncios, prontos para gravar e colar. Aqui vão 2 dos ' + nIdeias + ':');
+  const video = C.k !== 'C0';
+  const cta = dk === 'site' ? NI.ctaSite : D.cta;
+  const fala = O.gancho.replace(/^"|"$/g,'');
+  const extraZap = dk === 'zap' ? 'Oi! Vi o seu vídeo no TikTok e queria ' + NI.verbo + '.' : null;
+  const aVar = {tipo:'Spark Ad · vídeo 9:16 · variação do vencedor', nome:'2311_spark_' + W1[0].toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '') + '_ganchos',
+    nota:'O vídeo é o mesmo que já vendeu, publicado no seu perfil. Muda só o **começo**: cada gancho vira um anúncio, e o TikTok mostra qual segura mais gente.',
+    rot:TN.ganchos.map((g, i) => ['Gancho ' + 'ABC'[i] + ' · 0–2 s', g[0], g[1].replace(/^"|"$/g,'') ? g[1] : '', g[2]]),
+    texto:TN.var, cta, som:'o som original do vídeo', zap:extraZap};
+  const rotTeste = video
+    ? [['0–2 s', C.k === 'C2' ? 'Criador já falando, olhando para a câmera, sem "oi, gente"' : 'Você em selfie, já falando, sem "oi, gente"', fala, O.titulo.toUpperCase()],
+       ['2–8 s','Corte seco para o produto ou o lugar, de perto', O.texto, '—'],
+       ['8–20 s','De volta para a câmera, mostrando na prática','[A resposta com um exemplo do seu dia a dia]','LEGENDA EM TODA A FALA'],
+       ['20–25 s','Apontando para o botão', dk === 'site' ? '"Toca no botão aqui embaixo."' : (dk === 'zap' ? '"Me chama no WhatsApp."' : '"Deixa o seu contato que eu te chamo."'), 'TOQUE EM ' + cta.toUpperCase()]]
+    : [['Foto 1','Fundo limpo, texto grande','', fala],['Fotos 2–4','Um argumento por foto','', O.texto],['Foto 5','Produto e chamada','', cta.toUpperCase()]];
+  const aTeste = {tipo:(video ? 'Vídeo 9:16 · 25 s' : 'Carrossel de fotos · 5 fotos') + ' · novo teste (10%)', nome:'2311_objecao_' + (video ? 'video' : 'carrossel') + '_v1', rot:rotTeste, texto:TN.teste, cta, som:video ? 'a sua voz, com legenda; música baixa da Biblioteca de Música Comercial' : 'música da Biblioteca de Música Comercial', zap:extraZap};
+  for (const a of [aVar, aTeste]) await html(id, 'ad', anuncio(a), 900);
+  if (dk === 'form') await html(id, 'msg', '<small>Perguntas do formulário instantâneo</small>1. Para quando você pensa em ' + NI.verbo + '? (esta semana · este mês · só pesquisando)<br>2. Qual o melhor horário para te chamar?', 600);
+  await say(id, 'O restante está no arquivo da campanha, no mesmo formato. Para o Spark Ad, peça ao cliente o **código de autorização** do post e me passe: eu coloco no anúncio. O trecho em **[colchetes]** é com você: eu não invento exemplo nem depoimento.');
+
+  /* ---------- 5. montagem ---------- */
+  await stage(id, 5, 'montagem', 78);
+  await say(id, '**Antes de subir, confira:** ' + D.checklist + '.\n\nPosso montar no TikTok Ads Manager pra você?');
+  const m = await choose(id, [{t:'Monta pra mim no TikTok Ads Manager.', k:'op'}], 82);
+  await think(id, 2.8, ['Abrindo o TikTok Ads Manager','Criando a campanha em rascunho','Subindo os vídeos']);
+  if (m.k === 'op'){
+    const acoes = [['Abrir(TikTok Ads Manager)','a sua conta, já logada no seu navegador'],['Criar campanha ' + (st === 'esc' ? cod + '_SMART' : cod),'RASCUNHO']];
+    if (st === 'esc') acoes.push(['Criar campanha ' + cod + '_TESTE','RASCUNHO']);
+    acoes.push(['Criar grupo(s) e ' + nIdeias + ' anúncios com textos e ganchos','RASCUNHO']);
+    await tools(id, 'Montou no TikTok Ads Manager pelo Chrome', acoes);
+    await say(id, 'Tudo montado como **rascunho**. Nada foi publicado e nenhum valor foi cobrado. Confira no Ads Manager e, quando você disser "pode publicar", eu publico. Eu nunca digito senha, cartão ou código.');
+  } else {
+    await say(id, 'O passo a passo **desta** campanha, campo por campo e com os valores que a gente decidiu, está no arquivo da campanha, na ordem em que os campos aparecem no TikTok Ads Manager.');
+  }
+  const arq = 'campanhas/2026-11-23_' + cod.slice(5).toLowerCase() + '_' + EST[st].nome.replace(/\+ /,'').replace(/ /g,'-').toLowerCase() + '.md';
+  await saved(id, arq, 'diagnóstico, estratégia, metas, ganchos, anúncios e checklist');
+  await html(id, 'done', '<div><b>✓ Diagnóstico</b>as suas metas em R$</div><div><b>✓ Estratégia</b>' + esc(EST[st].nome) + ' para ' + esc(brl(V)) + '/dia</div><div><b>✓ 90/10</b>' + nIdeias + ' anúncios a partir dos vencedores</div><div><b>✓ Ganchos</b>3 começos de 2 s para testar</div><div><b>✓ Anúncios</b>em ' + esc(C.fmt) + '</div><div><b>✓ Montagem</b>' + (m.k === 'op' ? 'rascunho no Ads Manager' : 'passo a passo') + '</div>', 700);
+
+  /* ---------- a oferta ---------- */
+  await stage(id, 0, 'quer este gestor na sua conta?', 100);
+  await think(id, 1.2, ['Finalizando']);
+  await say(id, 'Pronto: a sua campanha está montada, do diagnóstico aos anúncios no TikTok Ads Manager, numa conversa só.\n\nE isso foi só uma amostra. **No seu Ads Manager de verdade, eu sou muito mais detalhista:** leio cada campanha, cada grupo, cada vídeo, quanto cada um segurou nos 2 primeiros segundos e cada comentário antes de decidir qualquer coisa. E guardo tudo, para a próxima campanha começar de onde a última parou.');
+  await desbloquear(id);
+  await ofertaNoChat(id);
+  const bf = el('div','bf'); log.appendChild(bf); initWheel(bf); down(); await wait(400); guard(id);
+  fimDaConversa();
+}
+
+/* ================= RASPADINHA DA BLACK FRIDAY =================
+   Revela o preço de lançamento: 50% do preço que o gestor terá depois da Black Friday.
+   Combine com a Hotmart: R$ 97 agora e R$ 194 depois de DATA_FIM. */
+const PRECO_DEPOIS = 194, PRECO_BF = 97, DATA_FIM = '30/11';
+let revelado = false;
+try { revelado = localStorage.getItem('bf26_tt_rasp') === '1'; } catch (e) {}
+function finalizar(box){
+  document.body.classList.add('revealed');
+  box.classList.add('won');
+  const c = box.querySelector('canvas'); if (c) c.style.opacity = 0;
+}
+function initWheel(box){
+  box.innerHTML = '<div class="bft">Black Friday</div><h4>Raspe e revele o seu preço</h4><div class="bfs">O preço de Black Friday está escondido aqui. Passe o dedo no cartão.</div>' +
+    '<div class="scr"><div class="prize"><b class="big">50% OFF</b><div class="np">de <s>R$ ' + PRECO_DEPOIS + '</s> por <b>R$ ' + PRECO_BF + '</b></div></div><canvas></canvas></div>' +
+    '<div class="res"><a href="' + CHECKOUT + '">Garantir o meu gestor por R$ ' + PRECO_BF + '</a><div class="fine">Preço de lançamento na Black Friday. Depois de ' + DATA_FIM + ', o gestor passa a custar R$ ' + PRECO_DEPOIS + '. Garantia de 7 dias.</div></div>';
+  if (revelado){ finalizar(box); return; }
+  const scr = box.querySelector('.scr'), cv = box.querySelector('canvas');
+  const desenhar = () => {
+    const w = scr.clientWidth, h = scr.clientHeight, d = window.devicePixelRatio || 1;
+    cv.width = w * d; cv.height = h * d;
+    const ctx = cv.getContext('2d'); ctx.scale(d, d);
+    const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#b9b2a4'); g.addColorStop(.5, '#e7e1d4'); g.addColorStop(1, '#9e978a');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#4a463f'; ctx.font = '700 18px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('RASPE AQUI', w / 2, h / 2);
+    ctx.globalCompositeOperation = 'destination-out';
+    return ctx;
+  };
+  let ctx = null, n = 0, ativo = false;
+  requestAnimationFrame(() => { ctx = desenhar(); scr.classList.add('pronto'); });
+  const pos = e => { const r = cv.getBoundingClientRect(), t = e.touches ? e.touches[0] : e; return [t.clientX - r.left, t.clientY - r.top]; };
+  const raspar = e => {
+    if (!ativo || !ctx || revelado) return; e.preventDefault();
+    const [x, y] = pos(e); ctx.beginPath(); ctx.arc(x, y, 24, 0, Math.PI * 2); ctx.fill();
+    if (++n % 8 === 0){
+      const dados = ctx.getImageData(0, 0, cv.width, cv.height).data; let livre = 0, tot = 0;
+      for (let i = 3; i < dados.length; i += 64){ tot++; if (dados[i] === 0) livre++; }
+      if (livre / tot > .45){
+        revelado = true;
+        try { localStorage.setItem('bf26_tt_rasp', '1'); } catch (e) {}
+        const topo = box.getBoundingClientRect().top;
+        document.querySelectorAll('.bf').forEach(finalizar);
+        abrirVendas(topo);
+      }
+    }
+  };
+  cv.addEventListener('pointerdown', e => { ativo = true; raspar(e); });
+  cv.addEventListener('pointermove', raspar);
+  addEventListener('pointerup', () => { ativo = false; });
+  cv.addEventListener('touchmove', raspar, {passive:false});
+}
+
+function start(){
+  run++; const id = run;
+  log.innerHTML = ''; $('#app').classList.remove('started','fim'); scrollTo(0, 0);
+  const h = el('div','hero home'); h.id = 'hero'; h.innerHTML = tpl.innerHTML; log.appendChild(h);
+  const hr = new Date().getHours(); h.querySelector('.greet').textContent = hr < 5 ? 'Boa noite' : hr < 12 ? 'Bom dia' : hr < 18 ? 'Boa tarde' : 'Boa noite';
+  main(id).catch(e => { if (e !== 'stop') console.error(e); });
+}
+const tpl = el('template'); tpl.innerHTML = $('#hero').innerHTML;
+initWheel($('#bfOffer'));
+/* passo gamificado antes da oferta: segurar o botão até o cadeado abrir */
+function desbloquear(id){
+  return new Promise(resolve => {
+    const box = el('div','unl');
+    box.innerHTML = '<div class="bft">Último passo</div><h4>Desbloqueie o seu gestor</h4><div class="bfs">Segure o botão até o cadeado abrir.</div>' +
+      '<button class="hold" type="button" aria-label="Segure para desbloquear o gestor"><svg class="hr" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="unlGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9cc3ff"/><stop offset="1" stop-color="#f1ece1"/></linearGradient></defs><circle cx="50" cy="50" r="46" class="trk"/><circle cx="50" cy="50" r="46" class="prg"/></svg>' +
+      '<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path class="arc" d="M8 11V8a4 4 0 0 1 8 0v3"/><path d="M12 15v2"/></svg></button>' +
+      '<span class="onda"></span><span class="onda o2"></span><div class="hint" aria-live="polite">Toque e segure</div>';
+    log.appendChild(box); down();
+    inp.classList.remove('busy'); ph.textContent = 'Segure o botão para desbloquear…';
+    const btn = box.querySelector('.hold'), prg = box.querySelector('.prg'), hint = box.querySelector('.hint');
+    const C = 2 * Math.PI * 46, DUR = 1600;
+    prg.style.strokeDasharray = C; prg.style.strokeDashoffset = C;
+    /* o tempo manda (setTimeout); a animação só desenha o progresso */
+    let t0 = 0, raf = 0, timer = 0, ok = false, p = 0, segurando = false;
+    const set = v => { p = v; prg.style.strokeDashoffset = C * (1 - v); box.style.setProperty('--p', v.toFixed(3)); };
+    const agora = () => Math.min(1, (performance.now() - t0) / DUR);
+    const tick = () => { if (!segurando) return; const v = agora(); set(v); hint.textContent = 'Segurando… ' + Math.round(v * 100) + '%'; raf = requestAnimationFrame(tick); };
+    const start = e => { if (ok || segurando) return; e.preventDefault(); segurando = true; t0 = performance.now() - p * DUR; timer = setTimeout(done, (1 - p) * DUR); box.classList.add('on'); try { navigator.vibrate && navigator.vibrate(15); } catch (_) {} raf = requestAnimationFrame(tick); };
+    const stop = () => {
+      if (ok || !segurando) return; segurando = false; clearTimeout(timer); cancelAnimationFrame(raf); set(agora()); box.classList.remove('on');
+      hint.textContent = p > .05 ? 'Quase! Segure até o cadeado abrir' : 'Toque e segure';
+      const de = p, s = performance.now();
+      const volta = now => { if (ok || segurando) return; const v = Math.max(0, de - (now - s) / 450); set(v); if (v > 0) requestAnimationFrame(volta); };
+      requestAnimationFrame(volta);
+    };
+    function done(){
+      if (ok) return; ok = true; segurando = false; cancelAnimationFrame(raf); set(1); btn.disabled = true;
+      box.style.setProperty('--cy', (btn.offsetTop + btn.offsetHeight / 2) + 'px');
+      box.classList.remove('on'); box.classList.add('open');
+      box.querySelector('.bft').textContent = 'Pronto';
+      box.querySelector('h4').textContent = 'Gestor desbloqueado';
+      box.querySelector('.bfs').textContent = 'Veja o que vem nele e o seu preço.';
+      hint.textContent = 'Desbloqueado!';
+      if (!reduce){
+        const cores = ['#86c79c','#f1ece1','#9cc3ff','#f0b37e'];
+        for (let i = 0; i < 26; i++){
+          const a = (i / 26) * Math.PI * 2 + Math.random() * .3, d = 80 + Math.random() * 90;
+          const f = el('span','fa'); f.style.background = cores[i % cores.length];
+          f.style.setProperty('--dx', Math.round(Math.cos(a) * d) + 'px'); f.style.setProperty('--dy', Math.round(Math.sin(a) * d) + 'px'); f.style.setProperty('--r', Math.round(Math.random() * 540 - 270) + 'deg');
+          if (i % 3 === 0) f.style.borderRadius = '50%';
+          box.appendChild(f); setTimeout(() => f.remove(), 1100);
+        }
+      }
+      try { navigator.vibrate && navigator.vibrate([20, 40, 30]); } catch (_) {}
+      setTimeout(resolve, reduce ? 0 : 1100);
+    }
+    btn.addEventListener('pointerdown', start);
+    ['pointerup','pointerleave','pointercancel'].forEach(t => btn.addEventListener(t, stop));
+    btn.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) start(e); });
+    btn.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') stop(); });
+    btn.addEventListener('contextmenu', e => e.preventDefault());
+  });
+}
+/* o cartão da oferta no chat é uma cópia exata do cartão da parte de vendas */
+async function ofertaNoChat(id){
+  const of = document.querySelector('#oferta .offer').cloneNode(true);
+  of.classList.add('no-chat');
+  of.querySelectorAll('[id]').forEach(e => e.removeAttribute('id'));
+  of.querySelectorAll('a[href="#bfOffer"]').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault(); const b = log.querySelector('.bf'); if (b) b.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'});
+  }));
+  log.appendChild(of); down(); await wait(600); guard(id);
+}
+/* depois da raspadinha: a parte de vendas aparece logo abaixo do preço, sem clique */
+function abrirVendas(topo){
+  const app = $('#app'), alvo = log.querySelector('.bf');
+  const antes = topo != null ? topo : (alvo ? alvo.getBoundingClientRect().top : 0);
+  liberar();
+  if (app.classList.contains('started') && alvo && !app.classList.contains('fim')){
+    app.classList.add('fim');
+    window.scrollTo({top: window.scrollY + alvo.getBoundingClientRect().top - antes, behavior: 'instant'});
+  }
+}
+function fimDaConversa(){
+  inp.classList.remove('busy'); opts.innerHTML = ''; opts.className = 'sugs';
+  ph.textContent = 'Raspe o cartão acima para ver o seu preço';
+  if (revelado) abrirVendas();
+}
+function liberar(){ document.body.classList.add('liberado'); try { localStorage.setItem('gestor_tt_liberado', '1'); } catch (e) {} }
+try { if (localStorage.getItem('gestor_tt_liberado') === '1') document.body.classList.add('liberado'); } catch (e) {}
+if (revelado) document.body.classList.add('revealed');
+
+$('#menuBtn').onclick = $('#menuBtn2').onclick = e => { e.stopPropagation(); $('#menu').classList.toggle('on'); };
+document.addEventListener('click', () => $('#menu').classList.remove('on'));
+$('#restart').onclick = e => { e.preventDefault(); start(); };
+
+const stick = $('#stick');
+addEventListener('scroll', () => {
+  const r = $('#oferta').getBoundingClientRect(), a = $('#app').getBoundingClientRect();
+  stick.classList.toggle('on', a.bottom < 0 && (r.top > innerHeight || r.bottom < 0));
+}, {passive:true});
+
+start();
+})();
+</script>
+</body>
+</html>
