@@ -62,9 +62,8 @@ code{font:.86em var(--mono);background:#253041;color:#9cc3ff;padding:.1em .38em;
 .vsl .ph{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:24px;text-align:center;color:var(--mut);font-size:14px}
 .vsl.sem .ph{display:flex}.vsl.sem .cam,.vsl.sem video,.vsl.sem .prog{display:none}
 .vsl .ph b{color:var(--cream);font-size:18px}
-.prog{position:absolute;left:16px;right:16px;bottom:14px;height:6px;border-radius:99px;background:#ffffff2e;box-shadow:0 1px 6px #0008;opacity:0;transition:opacity .3s;z-index:1}.vsl.ouvindo .prog{opacity:1}
-.prog span{position:relative;display:block;height:100%;width:0;border-radius:99px;min-width:6px;background:linear-gradient(90deg,#c9603d,#e07a55 60%,#f4a07c);box-shadow:0 0 10px #e07a5599}
-.prog span::after{content:"";position:absolute;right:-6px;top:50%;width:13px;height:13px;border-radius:50%;background:#fff;transform:translateY(-50%);box-shadow:0 0 8px #e07a55}
+.prog{position:absolute;left:0;right:0;bottom:0;height:6px;background:#ffffff33;opacity:0;transition:opacity .3s;z-index:1}.vsl.ouvindo .prog{opacity:1}
+.prog span{display:block;height:100%;width:0;background:var(--dot)}
 
 /* portas */
 .portas{background:radial-gradient(120% 80% at 50% 0%,#3a2a1c 0%,#161514 65%);border:1px solid #5a4630;border-radius:22px;padding:28px 16px 24px;text-align:center}
@@ -341,8 +340,12 @@ box.addEventListener('click', e => { const a = e.target.closest('[data-a]'); if 
   if (a.dataset.a === 'seguir') { mostra('toque'); toca(); } });
 v.addEventListener('ended', () => { if (!comSom) { v.currentTime = 0; toca(); return; }
   mostra('fim'); try { localStorage.removeItem(chave); } catch (e) {} });
-// barra: anda mais rápido no começo e desacelera (curva), atualizada a cada quadro para ficar suave
-const barra = () => { if (v.duration) pr.style.width = (comSom ? (1 - Math.pow(1 - v.currentTime / v.duration, 2.2)) * 100 : 0) + '%'; requestAnimationFrame(barra); };
+// barra no padrão da Vturb (linha fina colada no fundo), bem mais rápida no começo; atualizada a cada quadro
+// pontos (tempo real -> barra): 8% do vídeo enche 30% da barra, 25% enche 60%, metade enche 82%
+const curva = [[0, 0], [.08, .30], [.25, .60], [.5, .82], [1, 1]];
+const avanco = p => { for (let i = 1; i < curva.length; i++) { const [x0, y0] = curva[i - 1], [x1, y1] = curva[i];
+  if (p <= x1) return y0 + (y1 - y0) * (p - x0) / (x1 - x0); } return 1; };
+const barra = () => { if (v.duration) pr.style.width = (comSom ? avanco(Math.min(1, v.currentTime / v.duration)) * 100 : 0) + '%'; requestAnimationFrame(barra); };
 requestAnimationFrame(barra);
 let gravado = 0;
 v.addEventListener('timeupdate', () => {
