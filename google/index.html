@@ -298,7 +298,8 @@ if (html.classList.contains('depois')) document.querySelectorAll('a[href*="pay.h
 const box = $('#vsl'), v = box.querySelector('video'), bt = box.querySelector('.play'), pr = box.querySelector('.prog span');
 v.addEventListener('error', () => box.classList.add('sem'), true);
 v.querySelector('source').addEventListener('error', () => box.classList.add('sem'));
-if (v.networkState === 3) box.classList.add('sem');
+v.addEventListener('loadedmetadata', () => box.classList.remove('sem'));
+setTimeout(() => { if (v.readyState === 0 && v.networkState === 3) box.classList.add('sem'); }, 4000);
 bt.addEventListener('click', () => { v.muted = false; v.currentTime = 0; v.controls = true; v.play(); bt.remove(); });
 v.addEventListener('timeupdate', () => { if (v.duration) pr.style.width = (v.currentTime / v.duration * 100) + '%'; });
 
