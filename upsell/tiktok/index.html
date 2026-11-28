@@ -2,6 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<script>/*idioma*/(function(){var q=new URLSearchParams(location.search).get('lang'),s=null;
+try{s=localStorage.getItem('lang')}catch(e){}
+var l=(q||s||(navigator.languages&&navigator.languages[0])||navigator.language||'').slice(0,2).toLowerCase();
+if(!l||l==='pt')return;if(['es','en','fr','it','de'].indexOf(l)<0)l='en';
+location.replace(location.pathname.replace(/index\.html$/,'').replace(/\/?$/,'/')+l+'/'+location.search+location.hash)})();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Seu bônus: os 3 gestores</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -118,14 +123,14 @@ footer .wrap{padding-bottom:90px}
   <div class="wrap">
     <div class="kick">Etapa 2 de 2 · Bônus de quem acabou de comprar</div>
     <h1>Você ganhou um bônus: os outros 2 gestores pela <em>metade do preço</em>.</h1>
-    <p class="sub">Junto com o seu gestor de <b id="h1Plat">Facebook</b>, você pode levar os gestores das outras duas plataformas por mais R$&nbsp;97, em vez de R$&nbsp;194. Esse bônus só aparece nesta etapa.</p>
+    <p class="sub">Junto com o seu gestor de <b id="h1Plat">Facebook</b>, você pode levar os gestores das outras duas plataformas por mais R$&nbsp;47, em vez de R$&nbsp;94. Esse bônus só aparece nesta etapa.</p>
 
     <div class="trio" id="trio"></div>
 
     <section class="offer" aria-labelledby="ofTit">
       <div class="bonus">Seu bônus: 50% OFF nos outros 2 gestores</div>
-      <div class="was" id="ofTit">Os 2 gestores separados: <s>R$ 194</s></div>
-      <div class="now"><small>+ R$</small>97</div>
+      <div class="was" id="ofTit">Os 2 gestores separados: <s>R$ 94</s></div>
+      <div class="now"><small>+ R$</small>47</div>
       <div class="note">pagamento único · acesso vitalício · sem preencher seus dados de novo</div>
 
       <!-- HOTMART - Sales Funnel Widget (Ferramentas → Funil de Vendas; o mesmo código serve para os 3 funis).
@@ -149,20 +154,21 @@ footer .wrap{padding-bottom:90px}
     </section>
 
     <section class="faq" aria-label="Perguntas frequentes">
-      <details><summary>Vou pagar de novo pelo gestor que já comprei?</summary><p>Não. Você paga só mais R$ 97 e passa a ter os três gestores. O que você já comprou continua igual.</p></details>
+      <details><summary>Vou pagar de novo pelo gestor que já comprei?</summary><p>Não. Você paga só mais R$ 47 e passa a ter os três gestores. O que você já comprou continua igual.</p></details>
       <details><summary>Preciso de outro plano do Claude?</summary><p>Não. O mesmo plano pago do Claude que você usa para um gestor serve para os três.</p></details>
       <details><summary>Como recebo os outros dois?</summary><p>Na mesma área de membros da Hotmart, com a pasta de cada gestor e o guia de instalação.</p></details>
-      <details><summary>Preciso aceitar o bônus para receber o meu gestor?</summary><p>Não. A sua compra já está confirmada. Se não quiser os outros dois, toque em "Pular esta etapa" e o seu acesso chega normalmente. A condição de + R$ 97 só aparece aqui.</p></details>
+      <details><summary>Preciso aceitar o bônus para receber o meu gestor?</summary><p>Não. A sua compra já está confirmada. Se não quiser os outros dois, toque em "Pular esta etapa" e o seu acesso chega normalmente. A condição de + R$ 47 só aparece aqui.</p></details>
     </section>
   </div>
 </main>
 
+<!--seletor--><div style="grid-area:auto;width:100%;text-align:center;font:500 12px system-ui,sans-serif;color:#a29e95;padding:6px 8px"><a href="" data-lang="pt" lang="pt" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:underline;opacity:1">Português</a><a href="es/" data-lang="es" lang="es" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Español</a><a href="en/" data-lang="en" lang="en" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">English</a><a href="fr/" data-lang="fr" lang="fr" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Français</a><a href="it/" data-lang="it" lang="it" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Italiano</a><a href="de/" data-lang="de" lang="de" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Deutsch</a></div><script>document.querySelectorAll('[data-lang]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();try{localStorage.setItem('lang',a.dataset.lang)}catch(x){}var q=new URLSearchParams(location.search);q.delete('lang');q=q.toString();location.href=a.getAttribute('href')+(q?'?'+q:'')||'./'})})</script><!--/seletor-->
 <footer><div class="wrap">
   <p>Facebook Ads com Claude, Google Ads com Claude e TikTok Ads com Claude são produtos independentes. Não são afiliados, patrocinados nem endossados pela Anthropic, pela Meta, pelo Google ou pelo TikTok. Claude é marca da Anthropic. Os nomes descrevem a ferramenta usada.</p>
   <p>Resultados de anúncios dependem do produto, da oferta, da verba e de outros fatores. Não há promessa de resultado ou renda.</p>
 </div></footer>
 
-<div class="stick" id="stick"><div><b>Bônus: + R$ 97</b>pelos outros 2 gestores</div><a href="#oferta">Ver bônus</a></div>
+<div class="stick" id="stick"><div><b>Bônus: + R$ 47</b>pelos outros 2 gestores</div><a href="#oferta">Ver bônus</a></div>
 
 <script>
 (() => {

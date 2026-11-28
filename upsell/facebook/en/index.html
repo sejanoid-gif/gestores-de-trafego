@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your bonus: all 3 managers</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1f1e1d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* Página de upsell: mesma identidade das páginas de vendas (fundo escuro, serifa nos títulos, creme nos destaques) */
+:root{
+  color-scheme:dark;
+  --bg:#1f1e1d; --bg2:#262624; --panel:#2b2a27; --line:#3d3b37;
+  --tx:#f0eee6; --mut:#a29e95; --dim:#75716a;
+  --ok:#86c79c; --cream:#f1ece1; --ink:#0d0d0d; --gold:#f0b37e;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --serif:'Libre Baskerville',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.55 var(--sans);-webkit-text-size-adjust:100%}
+a{color:inherit}
+.wrap{max-width:620px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+
+/* faixa de confirmação da compra */
+.okbar{background:#20302a;border-bottom:1px solid #2f4a3a;color:#cfe9d7;font-size:14px}
+.okbar .wrap{padding-block:12px 13px}
+.okbar b{color:#e9f6ed}
+/* etapas: 1 compra confirmada · 2 bônus */
+.etapas{list-style:none;display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.etapas li{display:flex;align-items:center;gap:7px;font:600 13.5px var(--sans);white-space:nowrap}
+.etapas li+li:before{content:"";width:28px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--ok),var(--gold));margin-right:3px}
+.etapas i{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 12px var(--sans);font-style:normal}
+.etapas .feita i{background:var(--ok);color:#13261b}
+.etapas .agora i{background:var(--gold);color:#2a1d0f;box-shadow:0 0 0 4px rgba(240,179,126,.22)}
+.etapas .agora span{color:#f6dcc2}
+.okmsg{font-size:13.5px;color:#b9d8c4}
+.sub{color:#d6d2c8;margin:-8px 0 22px;max-width:34em}
+.sub b{color:var(--cream)}
+
+main .wrap{padding-block:26px 40px}
+.kick{font:700 12px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+h1{font:400 clamp(26px,6.6vw,38px)/1.2 var(--serif);letter-spacing:-.01em;text-wrap:balance;margin-bottom:22px}
+h1 em{font-style:italic;color:var(--cream)}
+.lead{color:#d6d2c8;max-width:34em;margin-bottom:26px}
+
+/* os 3 gestores */
+.trio{display:grid;gap:10px;margin-bottom:26px}
+.g{display:flex;gap:14px;align-items:flex-start;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:14px 16px;min-width:0}
+.g.new{border-color:#5a4630;background:linear-gradient(180deg,#2c2620,#262624)}
+.g.mine{opacity:.62}
+.tile{flex:none;width:48px;height:48px;border-radius:12px;background:var(--ink);border:1px solid #333;color:var(--cream);font:400 17px/.92 var(--serif);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.g .tx{min-width:0;flex:1}
+.g .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.g b{font-size:16px}
+.pill{font:700 11px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;padding:5px 8px;border-radius:999px;white-space:nowrap}
+.pill.inc{background:#4a3a24;color:var(--gold)}
+.pill.have{background:#2a4434;color:var(--ok)}
+.g ul{list-style:none;margin-top:6px;display:grid;gap:3px}
+.g li{font-size:14px;color:var(--mut);padding-left:16px;position:relative}
+.g li:before{content:"";position:absolute;left:2px;top:.62em;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6}
+.g.mine li{display:none}
+
+/* oferta */
+.offer{background:var(--cream);color:var(--ink);border-radius:22px;padding:24px 20px 22px;text-align:center}
+.offer .bonus{display:inline-block;font:800 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#7a3c12;background:#f6d9bd;border-radius:999px;padding:6px 12px;margin-bottom:10px}
+.offer .was{font-size:14.5px;color:#5a564e}
+.offer .was s{color:#8a857b}
+.offer .now{font:700 46px/1 var(--sans);letter-spacing:-.02em;margin:8px 0 4px}
+.offer .now small{font-size:22px;font-weight:700;vertical-align:.45em;margin-right:4px}
+.offer .note{font-size:13.5px;color:#5a564e;margin-bottom:18px}
+#hotmart-sales-funnel{margin:0 auto 4px;max-width:420px}
+/* o iframe da Hotmart tem largura mínima de 320px: no celular ele usa a largura toda do cartão */
+@media (max-width:420px){#hotmart-sales-funnel{margin-left:-20px;margin-right:-20px;max-width:none}}
+[hidden]{display:none!important}
+.buy{display:block;max-width:420px;margin:0 auto;background:var(--ink);color:var(--cream);text-decoration:none;font-weight:700;font-size:17px;padding:17px 18px;border-radius:14px}
+.buy:focus-visible,.no:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.no{display:inline-block;margin-top:14px;font-size:14px;color:#5a564e;text-decoration:underline;text-underline-offset:3px}
+.guar{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:18px;font-size:13.5px;color:#5a564e;text-align:left}
+.guar span{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--ink)}
+
+/* por que os 3 */
+.why{margin-top:34px;display:grid;gap:12px}
+.why h2{font:400 22px/1.3 var(--serif);margin-bottom:2px}
+.why p{color:#d6d2c8;font-size:15.5px}
+.faq{margin-top:28px}
+details{border-bottom:1px solid var(--line);padding:14px 0}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";color:var(--mut);font-size:20px;line-height:1}
+details[open] summary:after{content:"–"}
+details p{color:var(--mut);margin-top:8px;font-size:15px}
+footer{border-top:1px solid var(--line);color:var(--dim);font-size:12.5px}
+footer .wrap{padding-block:24px 40px}
+footer p+p{margin-top:8px}
+/* barra fixa com o botão até a oferta aparecer */
+.stick{position:fixed;left:0;right:0;bottom:0;z-index:10;background:rgba(31,30,29,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px max(16px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;gap:12px;align-items:center;justify-content:space-between;transition:transform .3s}
+.stick.off{transform:translateY(110%)}
+.stick div{font-size:14px;line-height:1.3}.stick div b{display:block;font-size:16px}
+.stick a{background:var(--cream);color:var(--ink);text-decoration:none;font-weight:700;padding:12px 16px;border-radius:12px;white-space:nowrap}
+footer .wrap{padding-bottom:90px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="okbar" role="status"><div class="wrap">
+  <ol class="etapas" aria-label="Steps">
+    <li class="feita"><i aria-hidden="true">✓</i><span>Purchase confirmed</span></li>
+    <li class="agora" aria-current="step"><i aria-hidden="true">2</i><span>Your bonus</span></li>
+  </ol>
+  <p class="okmsg">Your access to <b id="okNome">Facebook Ads com Claude</b> is secured and will reach your email in a few minutes.</p>
+</div></div>
+
+<main>
+  <div class="wrap">
+    <div class="kick">Step 2 of 2 · Bonus for new buyers</div>
+    <h1>You've got a bonus: the other 2 managers at <em>half price</em>.</h1>
+    <p class="sub">Along with your <b id="h1Plat">Facebook</b> manager, you can add the managers for the other two platforms for R$&nbsp;47 more, instead of R$&nbsp;94. This bonus only appears at this step. Files are in Portuguese.</p>
+
+    <div class="trio" id="trio"></div>
+
+    <section class="offer" aria-labelledby="ofTit">
+      <div class="bonus">Your bonus: 50% OFF the other 2 managers</div>
+      <div class="was" id="ofTit">Both managers bought separately: <s>R$ 94</s></div>
+      <div class="now"><small>+ R$</small>47</div>
+      <div class="note">one-time payment · lifetime access · no need to re-enter your details</div>
+
+      <!-- HOTMART - Sales Funnel Widget (Ferramentas → Funil de Vendas; o mesmo código serve para os 3 funis).
+           Ele mostra os botões "Sim, quero o meu bônus" (1 clique) e "Pular esta etapa". -->
+      <div id="hotmart-sales-funnel"></div>
+      <script src="https://checkout.hotmart.com/lib/hotmart-checkout-elements.js"></script>
+      <script>try { checkoutElements.init('salesFunnel').mount('#hotmart-sales-funnel'); } catch (e) {}</script>
+      <!-- HOTMART - Sales Funnel Widget -->
+      <!-- Reserva: só aparece se o widget não carregar, para o "pular" nunca sumir -->
+      <a class="no" id="pular" href="https://grupo8.site/obrigado/">Skip this step: I only want my manager</a>
+
+      <div class="guar"><span>7</span>7-day guarantee by Hotmart, same as your first purchase.</div>
+    </section>
+
+    <section class="why">
+      <h2>Why have all three</h2>
+      <p>If you advertise on more than one platform, you need a manager for each. Each one knows its platform's structure, metrics and terms, and all learn from your account.</p>
+      <p><b>Each platform reaches customers at a different moment.</b> On Google they're already searching, on Facebook and Instagram you reach people who don't know you yet, and on TikTok you win attention in the first 2 seconds.</p>
+      <p><b>Same method in all three.</b> They start from your average order and margin, build the campaign in 5 steps with your approval and keep what worked.</p>
+      <p><b>One Claude plan.</b> All three run on the same Claude Code, each in its own folder.</p>
+    </section>
+
+    <section class="faq" aria-label="FAQ">
+      <details><summary>Will I pay again for the manager I already bought?</summary><p>No. You pay just R$ 47 more and get all three. What you bought stays the same.</p></details>
+      <details><summary>Do I need another Claude plan?</summary><p>No. The same paid Claude plan you use for one manager covers all three.</p></details>
+      <details><summary>How do I get the other two?</summary><p>In the same Hotmart members area, with each manager's folder and the install guide.</p></details>
+      <details><summary>Do I have to accept the bonus to get my manager?</summary><p>No. Your purchase is already confirmed. If you don't want the other two, skip this step and your access arrives as usual. The + R$ 47 offer only appears here.</p></details>
+    </section>
+  </div>
+</main>
+
+<!--seletor--><div style="grid-area:auto;width:100%;text-align:center;font:500 12px system-ui,sans-serif;color:#a29e95;padding:6px 8px"><a href="../" data-lang="pt" lang="pt" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Português</a><a href="../es/" data-lang="es" lang="es" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Español</a><a href="../en/" data-lang="en" lang="en" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:underline;opacity:1">English</a><a href="../fr/" data-lang="fr" lang="fr" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Français</a><a href="../it/" data-lang="it" lang="it" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Italiano</a><a href="../de/" data-lang="de" lang="de" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Deutsch</a></div><script>document.querySelectorAll('[data-lang]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();try{localStorage.setItem('lang',a.dataset.lang)}catch(x){}var q=new URLSearchParams(location.search);q.delete('lang');q=q.toString();location.href=a.getAttribute('href')+(q?'?'+q:'')||'./'})})</script><!--/seletor-->
+<footer><div class="wrap">
+  <p>Facebook Ads com Claude, Google Ads com Claude and TikTok Ads com Claude are independent products. They are not affiliated with, sponsored or endorsed by Anthropic, Meta, Google or TikTok. Claude is a trademark of Anthropic. The names describe the tool used.</p>
+  <p>Ad results depend on the product, offer, budget and other factors. No results or income are promised.</p>
+</div></footer>
+
+<div class="stick" id="stick"><div><b>Bonus: + R$ 47</b>for the other 2 managers</div><a href="#oferta">See bonus</a></div>
+
+<script>
+(() => {
+  const stick = document.getElementById('stick'), oferta = document.querySelector('.offer');
+  oferta.id = 'oferta';
+  const botao = oferta.querySelector('.now');
+  /* Vindo do funil, a Hotmart manda os dados da compra no endereço e o widget mostra os dois botões
+     (inclusive o "pular"). Sem esses dados o widget não tem botão, então o "pular" de reserva aparece. */
+  const dadosCompra = [...new URLSearchParams(location.search).keys()].some(k => k !== 'de');
+  document.getElementById('pular').hidden = dadosCompra;
+  const ver = () => { const r = botao.getBoundingClientRect(); stick.classList.toggle('off', r.top < innerHeight && r.bottom > 0); };
+  addEventListener('scroll', ver, {passive:true}); addEventListener('resize', ver); ver();
+  document.querySelector('.stick a').addEventListener('click', e => { e.preventDefault(); oferta.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center'}); });
+  /* qual gestor a pessoa acabou de comprar: /upsell/facebook/, /upsell/google/, /upsell/tiktok/ ou ?de=google */
+  const G = {
+    facebook:{nome:'Facebook Ads com Claude', curto:'Facebook', mono:['FA','CL'], plat:'Facebook and Instagram Ads',
+      itens:['The right structure for your budget, from testing to scaling','Variations of what sold + 1 new test per round','Reads comments and creates an ad for the #1 question']},
+    google:{nome:'Google Ads com Claude', curto:'Google', mono:['GA','CL'], plat:'Google Ads: Search, Performance Max and YouTube',
+      itens:['Keywords by intent and a negative list','Headlines and descriptions with character counts','Reads search terms and cuts wasted spend']},
+    tiktok:{nome:'TikTok Ads com Claude', curto:'TikTok', mono:['TA','CL'], plat:'TikTok Ads: native creative, Spark Ads and Smart+',
+      itens:['Hooks for the first 2 seconds','Native scripts to film on your phone','Spark Ads and Smart+ to scale what worked']}
+  };
+  const m = location.pathname.match(/upsell\/(facebook|google|tiktok)/);
+  let comprou = (m && m[1]) || new URLSearchParams(location.search).get('de') || document.documentElement.dataset.comprou || 'facebook';
+  if (!G[comprou]) comprou = 'facebook';
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  document.getElementById('okNome').textContent = G[comprou].nome;
+  document.getElementById('h1Plat').textContent = G[comprou].curto;
+  const ordem = [comprou].concat(Object.keys(G).filter(k => k !== comprou));
+  document.getElementById('trio').innerHTML = ordem.map(k => {
+    const g = G[k], meu = k === comprou;
+    return '<div class="g ' + (meu ? 'mine' : 'new') + '"><div class="tile" aria-hidden="true"><span>' + g.mono[0] + '</span><span>' + g.mono[1] + '</span></div>' +
+      '<div class="tx"><div class="top"><b>' + esc(g.nome) + '</b><span class="pill ' + (meu ? 'have' : 'inc') + '">' + (meu ? 'You have it' : 'Included') + '</span></div>' +
+      '<ul>' + g.itens.slice(0, 2).map(i => '<li>' + esc(i) + '</li>').join('') + '</ul></div></div>';
+  }).join('');
+})();
+</script>
+</body>
+</html>

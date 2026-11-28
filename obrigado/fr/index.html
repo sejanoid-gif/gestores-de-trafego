@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Achat confirmé</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1f1e1d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#1f1e1d; --bg2:#262624; --line:#3d3b37;
+  --tx:#f0eee6; --mut:#a29e95; --dim:#75716a;
+  --ok:#86c79c; --cream:#f1ece1; --ink:#0d0d0d;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --serif:'Libre Baskerville',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.55 var(--sans);-webkit-text-size-adjust:100%}
+.wrap{max-width:620px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+main .wrap{padding-block:48px 40px}
+.check{width:56px;height:56px;border-radius:50%;background:var(--ok);color:#13261b;display:grid;place-items:center;font:700 26px var(--sans);margin-bottom:22px}
+h1{font:400 clamp(26px,6.6vw,36px)/1.2 var(--serif);letter-spacing:-.01em;text-wrap:balance;margin-bottom:16px}
+.lead{color:#d6d2c8;margin-bottom:28px;max-width:34em}
+ol{list-style:none;display:grid;gap:10px;margin-bottom:28px;counter-reset:p}
+ol li{counter-increment:p;display:flex;gap:14px;align-items:flex-start;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+ol li:before{content:counter(p);flex:none;width:26px;height:26px;border-radius:50%;background:var(--cream);color:var(--ink);display:grid;place-items:center;font:700 13px var(--sans)}
+ol b{color:var(--cream)}
+ol span{color:#d6d2c8;font-size:15px}
+.btn{display:block;max-width:420px;background:var(--cream);color:var(--ink);text-decoration:none;text-align:center;font-weight:700;font-size:17px;padding:16px 18px;border-radius:14px}
+.btn:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+.help{color:var(--mut);font-size:14px;margin-top:18px}
+footer{border-top:1px solid var(--line);color:var(--dim);font-size:12.5px}
+footer .wrap{padding-block:24px 40px}
+</style>
+</head>
+<body>
+<main><div class="wrap">
+  <div class="check" aria-hidden="true">✓</div>
+  <h1>Achat confirmé. Votre accès arrive.</h1>
+  <p class="lead">Hotmart envoie l'accès à l'e-mail utilisé pour l'achat, généralement en quelques minutes.</p>
+  <ol>
+    <li><span><b>Ouvrez l'e-mail de Hotmart</b> sur l'accès au produit. Sinon, vérifiez les spams et Promotions.</span></li>
+    <li><span><b>Entrez dans l'espace membre</b> et ouvrez la leçon "Baixe e instale o seu gestor" (télécharger et installer). Le fichier et le guide PDF, en portugais, s'y trouvent.</span></li>
+    <li><span><b>Suivez les 5 étapes</b> et écrivez "bonjour, réponds en français" dans Claude Code. Le gestionnaire se présente et lance la configuration.</span></li>
+  </ol>
+  <a class="btn" href="https://consumer.hotmart.com/">Voir mes achats Hotmart</a>
+  <p class="help">Connectez-vous avec l'e-mail de l'achat. Besoin d'aide ? Répondez à l'e-mail de confirmation.</p>
+</div></main>
+<!--seletor--><div style="grid-area:auto;width:100%;text-align:center;font:500 12px system-ui,sans-serif;color:#a29e95;padding:6px 8px"><a href="../" data-lang="pt" lang="pt" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Português</a><a href="../es/" data-lang="es" lang="es" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Español</a><a href="../en/" data-lang="en" lang="en" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">English</a><a href="../fr/" data-lang="fr" lang="fr" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:underline;opacity:1">Français</a><a href="../it/" data-lang="it" lang="it" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Italiano</a><a href="../de/" data-lang="de" lang="de" style="display:inline-block;padding:4px 7px;color:inherit;background:none;border:0;border-radius:0;text-decoration:none;opacity:0.6">Deutsch</a></div><script>document.querySelectorAll('[data-lang]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();try{localStorage.setItem('lang',a.dataset.lang)}catch(x){}var q=new URLSearchParams(location.search);q.delete('lang');q=q.toString();location.href=a.getAttribute('href')+(q?'?'+q:'')||'./'})})</script><!--/seletor-->
+<footer><div class="wrap">
+  <p>Facebook Ads com Claude, Google Ads com Claude et TikTok Ads com Claude sont des produits indépendants, ni affiliés, ni sponsorisés, ni approuvés par Anthropic, Meta, Google ou TikTok. Claude est une marque d'Anthropic.</p>
+</div></footer>
+</body>
+</html>
